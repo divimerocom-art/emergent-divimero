@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { api } from "@/lib/api";
 import FeedCard from "@/components/FeedCard";
+import TickerStrip from "@/components/TickerStrip";
 import { Link } from "react-router-dom";
 import { Plus, Sparkles } from "lucide-react";
 
@@ -10,8 +11,9 @@ export default function Feed() {
   useEffect(() => { load(); }, []);
 
   return (
-    <div className="max-w-2xl mx-auto">
-      <div className="flex items-end justify-between mb-4">
+    <div className="max-w-2xl mx-auto space-y-4">
+      <TickerStrip />
+      <div className="flex items-end justify-between">
         <div>
           <h1 className="font-heading text-2xl md:text-3xl font-bold tracking-tight">Akış</h1>
           <p className="text-sm text-mute">Yatırımcıların söyledikleri ve — paylaşırlarsa — yaptıkları.</p>

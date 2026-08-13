@@ -323,6 +323,27 @@ async def get_quote(symbol: str):
         raise HTTPException(404, "Sembol bulunamadı")
     return q.__dict__
 
+
+@api.get("/market/movers")
+async def movers(limit: int = 8):
+    prov = get_market_data_provider()
+    all_symbols = [t.symbol for t in prov.list_tickers()]
+    quotes = prov.get_quotes(all_symbols)
+    rows = []
+    for sym, q in quotes.items():
+        info = prov.get_ticker(sym)
+        rows.append({
+            "symbol": sym,
+            "name": info.name if info else sym,
+            "price": q.price,
+            "change_pct": q.change_pct,
+            "source": q.source,
+        })
+    rows.sort(key=lambda r: r["change_pct"], reverse=True)
+    top = rows[:limit]
+    bottom = list(reversed(rows[-limit:]))
+    return {"gainers": top, "losers": bottom, "source": prov.name}
+
 # --- Social: Posts / Feed ---------------------------------------------------
 def _bucket_range(pct: float) -> str:
     if pct <= 0: return "0%"
@@ -669,6 +690,18 @@ async def create_alert(payload: AlertIn, user=Depends(get_current_user)):
     await db.alerts.insert_one(doc)
     doc.pop("_id", None)
     return {**doc, "followee": public_user(followee)}
+
+
+@api.patch("/alerts/{alert_id}")
+async def update_alert(alert_id: str, patch: dict, user=Depends(get_current_user)):
+    allowed = {k: v for k, v in patch.items() if k in {"active", "direction", "threshold_pct"}}
+    if not allowed:
+        raise HTTPException(400, "Güncellenecek alan yok")
+    r = await db.alerts.update_one({"id": alert_id, "user_id": user["id"]}, {"$set": allowed})
+    if r.matched_count == 0:
+        raise HTTPException(404, "Uyarı bulunamadı")
+    doc = await db.alerts.find_one({"id": alert_id}, {"_id": 0})
+    return doc
 
 
 @api.delete("/alerts/{alert_id}")

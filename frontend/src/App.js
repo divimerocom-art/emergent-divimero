@@ -14,6 +14,7 @@ import Compose from "@/pages/Compose";
 import TransactionNew from "@/pages/TransactionNew";
 import PostDetail from "@/pages/PostDetail";
 import Onboarding from "@/pages/Onboarding";
+import Alerts from "@/pages/Alerts";
 
 function Private({ children }) {
   const { user, loading } = useAuth();
@@ -35,6 +36,7 @@ function AppRoutes() {
       <Route path="/onboarding" element={<Private><Onboarding /></Private>} />
       <Route path="/portfolio" element={<Private><AppShell><Portfolio /></AppShell></Private>} />
       <Route path="/portfolio/new" element={<Private><AppShell><TransactionNew /></AppShell></Private>} />
+      <Route path="/alerts" element={<Private><AppShell><Alerts /></AppShell></Private>} />
       <Route path="/compose" element={<Private><AppShell><Compose /></AppShell></Private>} />
       <Route path="/u/:username" element={<AppShell><Profile /></AppShell>} />
       <Route path="/p/:postId" element={<AppShell><PostDetail /></AppShell>} />

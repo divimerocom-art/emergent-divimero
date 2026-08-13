@@ -75,7 +75,11 @@ export default function NotificationsBell() {
               ))}
             </ul>
           )}
+          <div className="border-t border-line px-4 py-2 flex items-center justify-between">
+          <Link to="/alerts" onClick={()=>setOpen(false)} className="text-xs font-medium text-brand hover:underline" data-testid="notif-manage-alerts">Uyarılarımı yönet →</Link>
+          <span className="text-[10px] text-mute">30 sn'de bir güncelleniyor</span>
         </div>
+      </div>
       )}
     </div>
   );
