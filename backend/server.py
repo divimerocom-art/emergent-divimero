@@ -140,6 +140,12 @@ class PostIn(BaseModel):
 class CommentIn(BaseModel):
     text: str = Field(min_length=1, max_length=1000)
 
+class AlertIn(BaseModel):
+    followee_username: str
+    ticker: str
+    direction: Literal["any", "increase", "decrease"] = "any"
+    threshold_pct: float = Field(gt=0, le=100)
+
 # --- Auth endpoints ---------------------------------------------------------
 @api.post("/auth/register")
 async def register(payload: RegisterIn, response: Response):
@@ -236,7 +242,7 @@ async def _portfolio_valuation(user_id: str) -> dict:
 @api.get("/portfolio")
 async def my_portfolio(user=Depends(get_current_user)):
     val = await _portfolio_valuation(user["id"])
-    val["source"] = "demo"   # market data label
+    val["source"] = get_market_data_provider().name
     # Money-weighted annualised return (XIRR)
     txs = await _user_txs(user["id"])
     try:
@@ -258,8 +264,22 @@ async def create_transaction(tx: TransactionIn, user=Depends(get_current_user)):
     doc["user_id"] = user["id"]
     doc["ticker"] = (doc.get("ticker") or "").upper() or None
     doc["created_at"] = now_iso()
+    # Capture pre-tx allocations for tickers we care about (this tx + all active alerts on the user)
+    watched = set()
+    if doc["ticker"]:
+        watched.add(doc["ticker"])
+    async for a in db.alerts.find({"followee_id": user["id"], "active": True}):
+        watched.add(a["ticker"])
+    pre_allocs: dict = {}
+    if watched:
+        for sym in watched:
+            a, _ = await _allocation_for(user["id"], sym)
+            pre_allocs[sym] = a
     await db.transactions.insert_one(doc)
     doc.pop("_id", None)
+    # Fire alerts for followers watching this creator on any changed ticker
+    if watched:
+        await _check_and_fire_alerts(user["id"], pre_allocs)
     return doc
 
 @api.delete("/portfolio/transactions/{tx_id}")
@@ -525,7 +545,7 @@ async def upload_media(file: UploadFile = File(...), user=Depends(get_current_us
     return {"id": record["id"], "url": f"/api/media/{record['id']}", "content_type": ctype, "kind": record["kind"]}
 
 @api.get("/media/{file_id}")
-async def get_media(file_id: str):
+async def get_media(file_id: str, request: Request):
     rec = await db.files.find_one({"id": file_id, "is_deleted": False})
     if not rec:
         raise HTTPException(404, "Dosya bulunamadı")
@@ -533,10 +553,133 @@ async def get_media(file_id: str):
         data, ct = await run_in_threadpool(get_object, rec["storage_path"])
     except Exception:
         raise HTTPException(502, "Depolama erişimi başarısız")
-    return FastResponse(content=data, media_type=rec.get("content_type") or ct,
-                        headers={"Cache-Control": "public, max-age=3600"})
+    media_type = rec.get("content_type") or ct or "application/octet-stream"
+    total = len(data)
+    etag = f'W/"{file_id}-{total}"'
+
+    # 304 Not Modified
+    if request.headers.get("if-none-match") == etag:
+        return FastResponse(status_code=304, headers={"ETag": etag, "Cache-Control": "public, max-age=86400"})
+
+    range_header = request.headers.get("range")
+    base_headers = {
+        "ETag": etag,
+        "Cache-Control": "public, max-age=86400",
+        "Accept-Ranges": "bytes",
+    }
+    if range_header and range_header.startswith("bytes="):
+        try:
+            rng = range_header[6:].split(",")[0].strip()
+            start_s, end_s = rng.split("-")
+            start = int(start_s) if start_s else 0
+            end = int(end_s) if end_s else total - 1
+            if start >= total or end >= total or start > end:
+                return FastResponse(status_code=416, headers={**base_headers, "Content-Range": f"bytes */{total}"})
+            chunk = data[start:end + 1]
+            return FastResponse(
+                content=chunk,
+                status_code=206,
+                media_type=media_type,
+                headers={
+                    **base_headers,
+                    "Content-Range": f"bytes {start}-{end}/{total}",
+                    "Content-Length": str(len(chunk)),
+                },
+            )
+        except ValueError:
+            pass  # fall through to full 200
+
+    return FastResponse(content=data, media_type=media_type,
+                        headers={**base_headers, "Content-Length": str(total)})
 
 # --- Notifications ---------------------------------------------------------
+async def _allocation_for(user_id: str, symbol: str) -> tuple[float, float]:
+    txs = await _user_txs(user_id)
+    provider = get_market_data_provider()
+    all_syms = list({(t.get("ticker") or "").upper() for t in txs if t.get("ticker")})
+    quotes = {s: q.price for s, q in provider.get_quotes(all_syms).items()}
+    return allocation_for_symbol(txs, quotes, symbol)
+
+
+async def _check_and_fire_alerts(followee_id: str, pre_allocs: dict):
+    """After a transaction is inserted for `followee_id`, check any active alerts
+    on their tickers and fire notifications for followers whose thresholds are met."""
+    async for alert in db.alerts.find({"followee_id": followee_id, "active": True}):
+        sym = alert["ticker"]
+        pre = pre_allocs.get(sym)
+        if pre is None:
+            continue
+        post_alloc, _ = await _allocation_for(followee_id, sym)
+        diff = post_alloc - pre
+        direction = alert["direction"]
+        if direction == "increase" and diff <= 0:
+            continue
+        if direction == "decrease" and diff >= 0:
+            continue
+        if abs(diff) < float(alert["threshold_pct"]):
+            continue
+        change_kind = "artırdı" if diff > 0 else ("kapattı" if post_alloc < 0.05 else "azalttı")
+        notif = {
+            "id": new_id(),
+            "user_id": alert["user_id"],
+            "kind": "alert",
+            "actor_id": followee_id,
+            "post_id": None,
+            "ticker": sym,
+            "before_pct": round(pre, 4),
+            "after_pct": round(post_alloc, 4),
+            "delta_pct": round(diff, 4),
+            "change_kind": change_kind,
+            "created_at": now_iso(),
+            "read": False,
+        }
+        await db.notifications.insert_one(notif)
+
+
+@api.get("/alerts")
+async def list_alerts(user=Depends(get_current_user)):
+    rows = await db.alerts.find({"user_id": user["id"]}, {"_id": 0}).sort("created_at", -1).to_list(200)
+    out = []
+    for a in rows:
+        f = await db.users.find_one({"id": a["followee_id"]}, {"password_hash": 0, "_id": 0})
+        out.append({**a, "followee": public_user(f) if f else None})
+    return out
+
+
+@api.post("/alerts")
+async def create_alert(payload: AlertIn, user=Depends(get_current_user)):
+    followee = await db.users.find_one({"username": payload.followee_username.lower()})
+    if not followee:
+        raise HTTPException(404, "Yaratıcı bulunamadı")
+    if followee["id"] == user["id"]:
+        raise HTTPException(400, "Kendinize uyarı kuramazsınız")
+    sym = payload.ticker.upper()
+    # replace any existing alert on the same (creator, ticker) pair
+    await db.alerts.delete_many({"user_id": user["id"], "followee_id": followee["id"], "ticker": sym})
+    doc = {
+        "id": new_id(),
+        "user_id": user["id"],
+        "followee_id": followee["id"],
+        "ticker": sym,
+        "direction": payload.direction,
+        "threshold_pct": payload.threshold_pct,
+        "active": True,
+        "created_at": now_iso(),
+    }
+    await db.alerts.insert_one(doc)
+    doc.pop("_id", None)
+    return {**doc, "followee": public_user(followee)}
+
+
+@api.delete("/alerts/{alert_id}")
+async def delete_alert(alert_id: str, user=Depends(get_current_user)):
+    r = await db.alerts.delete_one({"id": alert_id, "user_id": user["id"]})
+    if r.deleted_count == 0:
+        raise HTTPException(404, "Uyarı bulunamadı")
+    return {"ok": True}
+
+
+@api.get("/notifications")
 @api.get("/notifications")
 async def list_notifications(user=Depends(get_current_user), limit: int = 30):
     rows = await db.notifications.find({"user_id": user["id"]}, {"_id": 0}).sort("created_at", -1).to_list(limit)
@@ -583,6 +726,7 @@ async def startup():
     await db.follows.create_index("followee_id")
     await db.likes.create_index([("post_id", 1), ("user_id", 1)], unique=True)
     await db.notifications.create_index([("user_id", 1), ("created_at", -1)])
+    await db.alerts.create_index([("user_id", 1), ("followee_id", 1), ("ticker", 1)], unique=True)
     await db.files.create_index("id", unique=True)
     # Best-effort init of Emergent object storage
     try:

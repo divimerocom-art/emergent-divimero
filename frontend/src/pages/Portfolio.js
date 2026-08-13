@@ -28,7 +28,7 @@ export default function Portfolio() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="font-heading text-2xl md:text-3xl font-bold tracking-tight">Portföy</h1>
-          <p className="text-sm text-mute inline-flex items-center gap-1.5"><Info size={14}/> Piyasa verisi: <span className="font-medium">Demo</span> — jüri değerlendirmesi için sabit fiyatlar.</p>
+          <p className="text-sm text-mute inline-flex items-center gap-1.5"><Info size={14}/> Piyasa verisi: <span className="font-medium">{p.source === "yahoo" ? "Yahoo Finance (canlı BIST)" : "Demo — sabit fiyatlar"}</span></p>
         </div>
         <Link to="/portfolio/new" className="inline-flex items-center gap-1.5 h-10 px-4 rounded-full bg-ink hover:bg-black text-white text-sm font-medium" data-testid="cta-new-tx">
           <Plus size={16}/> Yeni işlem

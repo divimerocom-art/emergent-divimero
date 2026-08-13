@@ -45,17 +45,32 @@ export default function NotificationsBell() {
             <ul className="max-h-96 overflow-auto divide-y divide-line">
               {data.items.map(n => (
                 <li key={n.id}>
-                  <Link to={`/p/${n.post_id}`} onClick={()=>setOpen(false)} className="block px-4 py-3 hover:bg-surface transition-colors">
-                    <div className="text-sm">
-                      <span className="font-heading font-semibold">{n.actor?.display_name}</span>
-                      <span className="text-mute"> yeni bir gönderi paylaştı</span>
-                      {n.has_disclosure && n.post_ticker && (
-                        <span className="ml-1.5 text-[10px] font-heading font-semibold px-1.5 py-0.5 rounded-full bg-violet-soft text-violet align-middle">{n.post_ticker} · Pozisyon açıklamalı</span>
-                      )}
+                  {n.kind === "alert" ? (
+                    <div className="block px-4 py-3 hover:bg-surface transition-colors" data-testid={`notif-alert-${n.id}`}>
+                      <div className="text-sm">
+                        <span className="font-heading font-semibold">{n.actor?.display_name}</span>
+                        <span className="text-mute"> pozisyonunu {n.change_kind}</span>
+                        <span className="ml-1.5 text-[10px] font-heading font-semibold px-1.5 py-0.5 rounded-full bg-brand-soft text-brand align-middle">{n.ticker}</span>
+                      </div>
+                      <div className="text-xs text-mute mt-0.5 tabular">
+                        {Number(n.before_pct||0).toLocaleString('tr-TR',{maximumFractionDigits:2})}% → {Number(n.after_pct||0).toLocaleString('tr-TR',{maximumFractionDigits:2})}%
+                        <span className={`ml-2 font-semibold ${n.delta_pct>=0?"text-pos":"text-neg"}`}>{n.delta_pct>=0?"+":""}{Number(n.delta_pct||0).toLocaleString('tr-TR',{maximumFractionDigits:2})} puan</span>
+                      </div>
+                      <div className="text-[11px] text-mute mt-1">{relTime(n.created_at)}</div>
                     </div>
-                    {n.post_preview && <div className="text-xs text-mute mt-0.5 line-clamp-2">{n.post_preview}</div>}
-                    <div className="text-[11px] text-mute mt-1">{relTime(n.created_at)}</div>
-                  </Link>
+                  ) : (
+                    <Link to={`/p/${n.post_id}`} onClick={()=>setOpen(false)} className="block px-4 py-3 hover:bg-surface transition-colors">
+                      <div className="text-sm">
+                        <span className="font-heading font-semibold">{n.actor?.display_name}</span>
+                        <span className="text-mute"> yeni bir gönderi paylaştı</span>
+                        {n.has_disclosure && n.post_ticker && (
+                          <span className="ml-1.5 text-[10px] font-heading font-semibold px-1.5 py-0.5 rounded-full bg-violet-soft text-violet align-middle">{n.post_ticker} · Pozisyon açıklamalı</span>
+                        )}
+                      </div>
+                      {n.post_preview && <div className="text-xs text-mute mt-0.5 line-clamp-2">{n.post_preview}</div>}
+                      <div className="text-[11px] text-mute mt-1">{relTime(n.created_at)}</div>
+                    </Link>
+                  )}
                 </li>
               ))}
             </ul>

@@ -4,9 +4,10 @@ import { api, pct, relTime } from "@/lib/api";
 import FeedCard from "@/components/FeedCard";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { UserPlus, UserCheck } from "lucide-react";
+import { UserPlus, UserCheck, Bell } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { toast } from "sonner";
+import AlertDialog from "@/components/AlertDialog";
 
 export default function Profile() {
   const { username } = useParams();
@@ -14,6 +15,7 @@ export default function Profile() {
   const [user, setUser] = useState(null);
   const [posts, setPosts] = useState([]);
   const [disc, setDisc] = useState([]);
+  const [alertOpen, setAlertOpen] = useState(false);
 
   const load = async () => {
     const [{ data: u }, { data: p }, { data: d }] = await Promise.all([
@@ -21,7 +23,7 @@ export default function Profile() {
     ]);
     setUser(u); setPosts(p); setDisc(d);
   };
-  useEffect(() => { load(); }, [username]);
+  useEffect(() => { load(); }, [username]); // eslint-disable-line react-hooks/exhaustive-deps
 
   if (!user) return <div className="text-mute">Yükleniyor…</div>;
 
@@ -51,12 +53,21 @@ export default function Profile() {
             </div>
           </div>
           {!isMe && (
-            <Button onClick={toggleFollow} className={`rounded-full ${user.is_following ? "bg-surface text-ink hover:bg-line" : "bg-ink hover:bg-black text-white"}`} data-testid="btn-follow">
-              {user.is_following ? <><UserCheck size={16} className="mr-1"/> Takiptesin</> : <><UserPlus size={16} className="mr-1"/> Takip et</>}
-            </Button>
+            <div className="flex items-center gap-2">
+              {me && (
+                <Button variant="outline" onClick={()=>setAlertOpen(true)} className="rounded-full border-line" data-testid="btn-alert">
+                  <Bell size={16} className="mr-1"/> Uyarı kur
+                </Button>
+              )}
+              <Button onClick={toggleFollow} className={`rounded-full ${user.is_following ? "bg-surface text-ink hover:bg-line" : "bg-ink hover:bg-black text-white"}`} data-testid="btn-follow">
+                {user.is_following ? <><UserCheck size={16} className="mr-1"/> Takiptesin</> : <><UserPlus size={16} className="mr-1"/> Takip et</>}
+              </Button>
+            </div>
           )}
         </div>
       </div>
+
+      <AlertDialog open={alertOpen} onOpenChange={setAlertOpen} followee={user} tickers={disc.map(d => d.ticker)}/>
 
       {/* Disclosed holdings */}
       {disc.length > 0 && (
