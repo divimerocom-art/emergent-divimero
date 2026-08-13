@@ -1,0 +1,44 @@
+{
+  "summary": "First E2E smoke test on Divimero. Backend auth, portfolio, market data, feed, likes, comments, follow, and the critical publication-snapshot immutability all pass. Frontend golden demo journey (Landing hero -> Demo Deniz login -> Feed -> Portfolio -> Compose -> Mobile bottom nav) works end to end. One MEDIUM issue: Ece's post-create with disclosure returns disclosure=null instead of storing a 0% snapshot.",
+  "tested_scope": ["backend", "frontend", "auth", "integration"],
+  "passed": [
+    "POST /api/auth/register creates user and returns token",
+    "POST /api/auth/login with deniz@divimero.com/demo1234 returns token; wrong password -> 401",
+    "GET /api/auth/me with Bearer returns Deniz",
+    "GET /api/portfolio (Deniz): total_value=208500, cash=107755, 5 holdings incl. THYAO with allocation 2.6978% and correct FIFO unrealized_pl (GARAN 3090, BIMAS 1210, ASELS 1840, TUPRS 1360, THYAO 441.66)",
+    "IMMUTABILITY: after POST /api/portfolio/transactions sell of 3 THYAO, portfolio allocation dropped to 2.2482%, but disclosure.disclosed_allocation_pct on existing posts remained 2.6 and 6.18 unchanged; current_position updated to 2.2482",
+    "GET /api/market/tickers returns 12 items incl. THYAO",
+    "GET /api/market/quote/THYAO returns price 312.5 TRY, source='demo'",
+    "POST /api/posts/{id}/like flips liked state; likes_count updates in /api/feed",
+    "POST /api/posts/{id}/comments adds comment; GET returns it with author (Ece)",
+    "POST /api/users/deniz.yatirim/follow toggles; followers_count updates and is_following reflects state",
+    "Landing page renders hero PositionDisclosureCard with 'Yayinlandiginda %5.20 / Guncel %2.60 / Azaltti' exactly",
+    "hero-demo-deniz button logs in and redirects to /feed with success toast 'Demo hesabina giris yapildi'",
+    "Feed shows Turkish content and Deniz THYAO thesis with published vs current allocation and Azaltti indicator",
+    "Portfolio page shows TOPLAM DEGER 208.500,00, NAKIT, NET YATIRIM, TOPLAM K/Z KPI cards, line chart, and holdings table incl. THYAO",
+    "Compose page: switch-attach toggles, disclosure-ticker select present",
+    "Mobile 390px viewport: bottom nav has nav-feed, nav-portfolio, nav-profile"
+  ],
+  "failed": [
+    {
+      "area": "Social / POST /api/posts",
+      "issue": "When Ece (no THYAO holding) creates a post with disclosure {ticker: THYAO, show_allocation:true, allocation_mode:exact}, response and later /api/feed return disclosure=null. Spec requires the 0% snapshot to still be stored.",
+      "evidence": "POST /api/posts returned id but disclosure=null; GET /api/feed for same post id shows disclosure:null and current_position:null",
+      "priority": "MEDIUM"
+    },
+    {
+      "area": "Frontend / Portfolio chart",
+      "issue": "Recharts warning: 'width(-1) and height(-1) of chart should be greater than 0' on Portfolio page. Chart still renders correctly, cosmetic.",
+      "evidence": "Console warning on /portfolio load",
+      "priority": "LOW"
+    }
+  ],
+  "action_items": [
+    "Fix POST /api/posts so that when disclosure is provided but user has 0 quantity of the ticker, a snapshot is still stored with underlying_allocation_pct=0 (per spec: 'empty portfolio => 0% allocation is acceptable but snapshot must still be stored').",
+    "Optional: set explicit min height on Recharts ResponsiveContainer on Portfolio page to silence width/height=-1 warning."
+  ],
+  "success_rate": {"backend": "95%", "frontend": "100%"},
+  "retest_needed": false,
+  "full_testing_deferred": true,
+  "test_credentials": "Read from /app/memory/test_credentials.md; Deniz/Ece demo1234 valid; admin123 for admin."
+}

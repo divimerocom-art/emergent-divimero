@@ -1,0 +1,50 @@
+{
+  "summary": "Iteration 2 e2e verification of the four new features (onboarding, media upload image+video, notifications fan-out, XIRR) plus golden-demo regression. Backend: 22/22 pytest cases pass (new suite /app/backend/tests/backend_test.py). Frontend: register->/onboarding->PATCH /auth/me->/feed works; Compose image+video upload renders previews and the published post renders <video data-testid=video-{id}> in feed and detail; Ece's bell shows unread badge, opening it marks read (unread=0) and notification links navigate to the post; Portfolio shows 'XIRR (yıllıklandırılmış)' = %3,80 for Deniz and 'Yeterli veri yok' for a brand new user; golden THYAO demo still renders published %2,60 vs current %2,25 with ↓ Azalttı. Found and fixed one real HIGH defect: /api/media and /api/uploads used blocking sync `requests` inside async endpoints, which serialized all media serving and produced 502s in the browser when a feed had several media items.",
+  "backend_issues": {
+    "critical": [],
+    "minor": [
+      {"endpoint": "GET /api/media/{id}", "issue": "Ignores HTTP Range headers — returns full 200 body instead of 206 partial content, so video seeking/streaming is inefficient and cannot scrub before full download. Also no ETag/304 and every request re-downloads from object storage (no cache) -> ~0.5-1s per media item."},
+      {"endpoint": "POST /api/uploads", "issue": "No magic-byte/content sniffing — trusts client-supplied Content-Type only; a renamed .exe sent as image/png is accepted. Also returns 200 (201 would be more correct) and there is no DELETE/orphan cleanup for uploaded files."},
+      {"endpoint": "GET /api/notifications", "issue": "N+1 queries (one users + one posts lookup per notification). Fine at demo scale, will not scale."},
+      {"endpoint": "POST /api/auth/register", "issue": "Returns 200 instead of 201; no `onboarded` flag on the user, so /onboarding relies purely on the frontend redirect (a user who refreshes mid-onboarding or logs in later is never prompted again)."}
+    ]
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": [
+      {"screen": "Compose (media preview)", "issues": ["Image and video previews are separate absolute-positioned blocks; when both are attached the small remove (X) buttons of the two previews can visually collide/overlap. Cosmetic only."]},
+      {"screen": "Onboarding", "issues": ["Page is vertically centred with min-h-screen so on 1080p the card sits low with a lot of empty space above; consider aligning top on tall viewports."]}
+    ]
+  },
+  "test_report_links": [
+    "/app/backend/tests/backend_test.py",
+    "/app/backend/tests/conftest.py",
+    "/app/test_reports/pytest/pytest_results.xml"
+  ],
+  "action_items": [
+    "Review my in-scope fix in /app/backend/server.py (starlette run_in_threadpool around put_object/get_object) and keep it — without it concurrent media requests were serialized (5 parallel GETs of a 300KB video took 40-60s and the browser logged 502 for /api/media/{id}).",
+    "Add Range (206) support + ETag/Cache validation, or return a redirect/signed URL to object storage, for GET /api/media/{id} so videos stream instead of being fully proxied on every request.",
+    "Validate real file signatures on POST /api/uploads instead of trusting Content-Type.",
+    "Golden-demo data drifted: Deniz has an extra stray transaction (sell 3 THYAO dated 2026-01-01, note='') left behind by iteration-1 testing. THYAO weight is now 2.2482% (seed intent 2.6978%) and XIRR 0.037963. The review request expected disclosure 5.20 / current ~2.7 but the seed actually writes 6.18 (thesis) and 2.6 (trim post) — update the expectation or reseed. I deliberately did NOT delete that tx because removing it makes current (2.6978) exceed the trim-post disclosure (2.6) and would flip the follow-up card from ↓ Azalttı to ↑ Arttırdı.",
+    "Consider persisting an `onboarded` flag so onboarding can resume/gate server-side."
+  ],
+  "critical_code_review_comments": [
+    "server.py: uploads/media used sync `requests` inside async def — this blocks the event loop; fixed with run_in_threadpool, but the same pattern must be avoided in any future storage/market-data integration.",
+    "storage.py: put_object/get_object have no size streaming — a 60MB video is fully buffered in memory twice (UploadFile.read() + requests body). Use streaming or a hard multipart limit.",
+    "create_post fan-out uses insert_many with no cap; for a large follower count this should be batched/background.",
+    "seed_demo.seed_all returns early if deniz exists, so seed values can never be corrected in an existing DB — add an idempotent reset (or admin reseed endpoint) for demo stability."
+  ],
+  "updated_files": [
+    "/app/backend/server.py",
+    "/app/backend/tests/backend_test.py",
+    "/app/backend/tests/conftest.py"
+  ],
+  "success_rate": {"backend": "100% (22/22)", "frontend": "100% of tested flows (onboarding, uploads, video render, notifications, XIRR, golden demo)"},
+  "seed_data_creation": "Created throwaway users test_<hex>@example.com / demo1234 and TEST_ posts + uploads during testing; all TEST posts, their notifications and the test users were deleted afterwards (feed back to 5 seeded posts, 0 notifications). Uploaded TEST media records remain in db.files (no delete endpoint exists).",
+  "should_call_test_agent_after_fix": false,
+  "should_main_agent_self_test": true,
+  "test_credentials": "deniz@divimero.com / demo1234, ece@divimero.com / demo1234, admin@divimero.com / admin123",
+  "context_for_next_testing_agent": "Run `pytest /app/backend/tests/ -q` (pytest.ini already sets -n 2 --dist loadscope). Suite covers health, register/onboarding PATCH, uploads (png/mp4/invalid 400), media byte-for-byte serve + 404, notification fan-out/read, XIRR (endpoint + unit), golden demo. Golden values in DB: THYAO thesis disclosed 6.18 (2025-08-13), trim post disclosed 2.6 (2025-08-26), current allocation 2.2482%, XIRR 0.037963. IMPORTANT: do not leave transactions on Deniz — iteration 1 left a stray sell that permanently shifted the golden numbers. Media endpoint latency ~0.5-1s per item; allow generous waits for video elements.",
+  "rca_of_the_issue": "Browser console showed `502` for GET /api/media/{id} whenever a feed page loaded more than one media item. RCA: /api/media and /api/uploads are `async def` endpoints that called storage.get_object/put_object, which use the blocking `requests` library. The blocking call ran on the event loop, so media requests were serialized: sequential fetches took ~0.5s each, but 5 concurrent fetches of a 300KB video took 39.9s/39.9s/40.1s and the ingress returned 502. Even a 74-byte PNG showed the tell-tale linear stair-step (0.66/0.85/1.08/1.38/1.66s) while /api/feed handled 5 concurrent requests in 0.20s each. Fix applied (in scope: missing async): wrapped both storage calls in starlette.concurrency.run_in_threadpool. After the fix 5 concurrent video GETs complete in ~1.0s each and a full Playwright feed load reports zero failed responses and zero console errors."
+}

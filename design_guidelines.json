@@ -1,0 +1,126 @@
+{
+  "theme": "light",
+  "colors": {
+    "background": "#FFFFFF",
+    "surface": "#F1F5F7",
+    "border": "#E3E3E3",
+    "text_main": "#171717",
+    "text_secondary": "#72777F",
+    "brand_primary": "#35C7B2",
+    "brand_secondary": "#7361F7",
+    "status_positive": "#12BD57",
+    "status_negative": "#FF3B30",
+    "icon_tints": {
+      "turquoise": { "bg": "#E1F4F1", "stroke": "#35C7B2" },
+      "gold": { "bg": "#FFF8DF", "stroke": "#D6B130" },
+      "purple": { "bg": "#E6E2FD", "stroke": "#7361F7" },
+      "orange": { "bg": "#FFE4D6", "stroke": "#FF7733" }
+    }
+  },
+  "typography": {
+    "headings": "Outfit",
+    "body": "Manrope",
+    "import_url": "https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&family=Outfit:wght@400;500;600;700&display=swap",
+    "rules": [
+      "BANNED FONTS: Inter, Roboto, Space Grotesk",
+      "Use Outfit for all headings (H1-H6), navigation links, and critical numerical values like Total Portfolio Balance",
+      "Use Manrope for all body text, paragraphs, lists, table data, and input fields",
+      "Headings should have tight tracking (tracking-tight) to look premium",
+      "Numbers in tables and financial readouts should use the tabular-nums utility to ensure aligned decimal points"
+    ]
+  },
+  "visual_enhancers": {
+    "rules": [
+      "Strictly avoid gradients, glassmorphism, and neon effects. Stick to flat, solid colors.",
+      "Use clean solid surfaces with crisp 1px borders (#E3E3E3) for definition.",
+      "Shadows should be extremely subtle (shadow-sm or none), mostly relying on borders to separate cards from the #FFFFFF background.",
+      "Card border radius: use rounded-xl or rounded-2xl for a premium, friendly but professional look.",
+      "Avatars and buttons should be pill-shaped (rounded-full) or match card radius (rounded-xl)."
+    ]
+  },
+  "components": {
+    "feed_card": {
+      "description": "The main unit of the social feed. Contains user info, thesis text, media, and the embedded position disclosure.",
+      "layout": "flex flex-col gap-4 p-4 md:p-6 bg-white border border-[#E3E3E3] rounded-2xl",
+      "elements": [
+        "Header: Avatar, Name (Outfit, font-semibold), Timestamp, Ticker tags (e.g. $THYAO) with #E6E2FD bg and #7361F7 text",
+        "Body: Plain text of the investment thesis (Manrope)",
+        "Hero Feature: Position Disclosure Card (if attached) rendered immediately below the text",
+        "Footer: Like, Comment, Share actions (lucide-react icons, #72777F text, hover to #171717)"
+      ]
+    },
+    "position_disclosure_card": {
+      "description": "The HERO feature. Embedded inside a post to show 'skin in the game'.",
+      "layout": "flex flex-col md:flex-row md:items-center justify-between p-4 bg-[#F1F5F7] rounded-xl border border-[#E3E3E3] gap-2 md:gap-0",
+      "data_points": [
+        "Yayınlandığında (At publication): e.g. %15 (tabular-nums)",
+        "Güncel (Current): e.g. %18 (tabular-nums)",
+        "Durum (Status Badge): ↑ Artırdı (Increased in green), ↓ Azalttı (Reduced in red), Kapatıldı (Closed in gray)"
+      ],
+      "styling": "Use font-medium for the percentages. The status badge should use the positive/negative colors subtly (e.g. text-[#12BD57] with bg-[#E1F4F1] for 'Artırdı')."
+    },
+    "portfolio_dashboard": {
+      "description": "High-level view of user's BIST portfolio.",
+      "layout": "Bento grid style on desktop, stacked flex-col on mobile. Add p-6 to cards.",
+      "widgets": [
+        "Total Balance Card: Massive typography (Outfit text-4xl or 5xl), daily P&L below it in green/red",
+        "Performance Chart: Recharts LineChart. Use flat solid stroke with #35C7B2. NO gradients.",
+        "Holdings Table: Clean rows, left-aligned ticker symbol in bold Outfit, right-aligned monetary values in Manrope."
+      ]
+    },
+    "transaction_form": {
+      "description": "Add/edit transaction (Buy/Sell/Deposit/Withdraw/Dividend)",
+      "styling": "Distinct label+input pairs. Input bg #FFFFFF, border #E3E3E3. Focus ring should be 2px solid #35C7B2. Buy action button in #35C7B2, Sell action button in #7361F7 or #FF3B30."
+    },
+    "mobile_bottom_nav": {
+      "description": "Fixed navigation at the bottom for mobile screens.",
+      "styling": "fixed bottom-0 w-full bg-white border-t border-[#E3E3E3] h-16 flex justify-around items-center z-50. Active tab uses #35C7B2 for icon and text, inactive uses #72777F."
+    }
+  },
+  "charts": {
+    "library": "recharts",
+    "styling": [
+      "Use #35C7B2 for positive trend lines, #FF3B30 for negative trend lines.",
+      "CartesianGrid should use #E3E3E3 with strokeDasharray='3 3' or be completely hidden for a cleaner look.",
+      "X/Y axis text should use #72777F, text-xs, Manrope.",
+      "Tooltip must be a flat card with #FFFFFF bg, #E3E3E3 border, no gradients, and light shadow-sm."
+    ]
+  },
+  "icons": {
+    "library": "lucide-react",
+    "usage": "Use 20px or 24px size. Stroke width 1.5 or 2 for a delicate, modern premium feel.",
+    "command": "yarn add lucide-react"
+  },
+  "images": {
+    "avatars": [
+      "https://images.unsplash.com/photo-1560250097-0b93528c311a?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA2ODl8MHwxfHNlYXJjaHwxfHxwcm9mZXNzaW9uYWwlMjBpbnZlc3RvciUyMHBvcnRyYWl0fGVufDB8fHx8MTc4NjY1MjI1NXww&ixlib=rb-4.1.0&q=85",
+      "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA2ODl8MHwxfHNlYXJjaHwyfHxwcm9mZXNzaW9uYWwlMjBpbnZlc3RvciUyMHBvcnRyYWl0fGVufDB8fHx8MTc4NjY1MjI1NXww&ixlib=rb-4.1.0&q=85",
+      "https://images.pexels.com/photos/7567299/pexels-photo-7567299.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940"
+    ],
+    "hero_illustrations": [
+      "https://images.unsplash.com/photo-1589561454226-796a8aa89b05?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NTY2NzR8MHwxfHNlYXJjaHwxfHxpc3RhbmJ1bCUyMHNreWxpbmUlMjBib3NwaG9ydXN8ZW58MHx8fHwxNzg2NjUyMjU1fDA&ixlib=rb-4.1.0&q=85"
+    ],
+    "post_images": [
+      "https://images.unsplash.com/photo-1590283603385-17ffb3a7f29f?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NTY2NzB8MHwxfHNlYXJjaHwxfHxzdG9jayUyMG1hcmtldCUyMGNoYXJ0JTIwYWJzdHJhY3R8ZW58MHx8fHwxNzg2NjUyMjU1fDA&ixlib=rb-4.1.0&q=85",
+      "https://images.unsplash.com/photo-1497032628192-86f99bcd76bc?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NTY2Njl8MHwxfHNlYXJjaHwxfHxjb2ZmZWUlMjBub3RlYm9vayUyMGRlc2slMjBmbGF0bGF5fGVufDB8fHx8MTc4NjY1MjI1NXww&ixlib=rb-4.1.0&q=85"
+    ]
+  },
+  "general_ui_ux_guidelines": [
+    "Always use 'data-testid' on interactive elements for robust automated testing.",
+    "Mobile-first architecture: Build layouts starting from base Tailwind classes, using md: and lg: for larger screens.",
+    "Do NOT use 'transition: all'. Explicitly state transitions (e.g., transition-colors, transition-transform) to avoid breaking transforms.",
+    "Avoid generic centered text across the app. Left-align text for better reading flow, especially for data grids and financial metrics.",
+    "Strictly avoid backdrop blur or glassmorphism. Use opaque backgrounds with crisp 1px borders.",
+    "Toasts: Use sonner for notifications (success/error).",
+    "Never use purely transparent backgrounds on overlays/dropdowns/headers. Use #FFFFFF with a 1px border and a subtle shadow."
+  ],
+  "instructions_to_main_agent": [
+    "Read this JSON and implement the exact requested colors in Tailwind config.",
+    "Import Outfit and Manrope from Google Fonts and apply them as directed.",
+    "Build a modern, clean, light-themed Turkish financial platform.",
+    "Prioritize the HERO feature: the Position Disclosure card embedded in the social feed.",
+    "Ensure all user-facing copy is in Turkish.",
+    "Strictly avoid dark mode, gradients, glassmorphism, and neon styles.",
+    "Remember to build for .js/.jsx (React), not .tsx."
+  ]
+}
