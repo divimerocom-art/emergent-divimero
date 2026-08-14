@@ -24,7 +24,7 @@ from starlette.concurrency import run_in_threadpool
 from motor.motor_asyncio import AsyncIOMotorClient
 from pydantic import BaseModel, EmailStr, Field, ConfigDict
 
-from market_data import get_market_data_provider
+from market_data import get_market_data_provider, search_catalog, clean_symbol
 from portfolio_calc import compute_state, valuation, allocation_for_symbol
 from xirr import xirr, build_cashflows
 from storage import init_storage, put_object, get_object, make_upload_path, APP_NAME as STORAGE_APP
@@ -311,35 +311,60 @@ async def performance(user=Depends(get_current_user)):
 
 # --- Market data ------------------------------------------------------------
 @api.get("/market/tickers")
-async def list_tickers(q: Optional[str] = None, limit: int = 200):
+async def list_tickers(q: Optional[str] = None, limit: int = 50, with_price: bool = False):
     prov = get_market_data_provider()
-    rows = [t.__dict__ for t in prov.list_tickers()]
-    if q:
-        needle = q.strip().lower()
-        rows = [r for r in rows if needle in r["symbol"].lower() or needle in r["name"].lower()]
-        # Prefer symbol prefix matches at the top
-        rows.sort(key=lambda r: (0 if r["symbol"].lower().startswith(needle) else 1, r["symbol"]))
-    return rows[:limit]
+    rows = [t.__dict__ for t in (search_catalog(q, limit=limit) if q else prov.list_tickers()[:limit])]
+    if with_price:
+        # Enrich with live/reference quote if available. Missing prices → price:null
+        symbols = [r["symbol"] for r in rows]
+        quotes = prov.get_quotes(symbols)
+        for r in rows:
+            q_ = quotes.get(r["symbol"])
+            r["price"] = q_.price if q_ else None
+            r["prev_close"] = q_.prev_close if q_ else None
+            r["change_pct"] = q_.change_pct if q_ else None
+            r["price_source"] = q_.source if q_ else None
+            r["price_available"] = q_ is not None
+    return rows
 
 
 @api.get("/market/search")
-async def search_market(q: str, limit: int = 25):
-    """Case-insensitive instrument search by ticker OR company name."""
-    return await list_tickers(q=q, limit=limit)
+async def search_market(q: str, limit: int = 25, with_price: bool = True):
+    """Case-insensitive instrument search by ticker OR company name.
+    Accepts formats like THYAO, THYAO.IS, BIST:THYAO, 'thy', 'türk hava', etc."""
+    return await list_tickers(q=q, limit=limit, with_price=with_price)
+
 
 @api.get("/market/quote/{symbol}")
 async def get_quote(symbol: str):
     prov = get_market_data_provider()
-    q = prov.get_quote(symbol)
-    if not q:
+    sym = clean_symbol(symbol)
+    info = prov.get_ticker(sym)
+    q = prov.get_quote(sym)
+    if info is None:
         raise HTTPException(404, "Sembol bulunamadı")
-    return q.__dict__
-
+    if q is None:
+        # Symbol exists in catalog but no price data available right now
+        return {
+            "symbol": sym,
+            "name": info.name,
+            "sector": info.sector,
+            "currency": "TRY",
+            "price": None, "prev_close": None, "change_pct": None,
+            "price_available": False,
+            "message": "Bu hisse için piyasa verisi şu anda alınamıyor.",
+        }
+    return {
+        **q.__dict__, "name": info.name, "sector": info.sector,
+        "price_available": True,
+    }
 
 @api.get("/market/movers")
 async def movers(limit: int = 8):
     prov = get_market_data_provider()
-    all_symbols = [t.symbol for t in prov.list_tickers()]
+    # Only symbols where we can get a quote — avoid noise from the whole 587 universe
+    from market_data import _DEMO_PRICES  # limited set with reliable coverage
+    all_symbols = list(_DEMO_PRICES.keys())
     quotes = prov.get_quotes(all_symbols)
     rows = []
     for sym, q in quotes.items():

@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Search, X, Check } from "lucide-react";
+import { Search, X, Check, ArrowUpRight, ArrowDownRight } from "lucide-react";
 import { Input } from "@/components/ui/input";
-import { api } from "@/lib/api";
+import { api, num } from "@/lib/api";
 
 /**
  * Instrument (BIST ticker) search combobox.
@@ -20,20 +20,26 @@ export default function InstrumentPicker({ value, onChange, restrictTo, placehol
   const [loading, setLoading] = useState(false);
   const ref = useRef(null);
 
-  // Fetch initial list + resolve name of selected symbol
+  // Fetch initial list + resolve name of selected symbol.
+  // Debounce query so we don't hammer the backend on every keystroke.
   useEffect(() => {
     let alive = true;
-    setLoading(true);
-    api.get(`/market/tickers${q ? `?q=${encodeURIComponent(q)}` : ""}`)
-      .then((r) => { if (alive) setItems(r.data); })
-      .finally(() => { if (alive) setLoading(false); });
-    return () => { alive = false; };
+    const handle = setTimeout(() => {
+      setLoading(true);
+      const url = q
+        ? `/market/search?q=${encodeURIComponent(q)}&with_price=true&limit=25`
+        : `/market/tickers?limit=25&with_price=false`;
+      api.get(url)
+        .then((r) => { if (alive) setItems(r.data); })
+        .finally(() => { if (alive) setLoading(false); });
+    }, q ? 180 : 0);
+    return () => { alive = false; clearTimeout(handle); };
   }, [q]);
 
   useEffect(() => {
     if (!value) { setSelected(null); return; }
     if (selected?.symbol === value) return;
-    api.get(`/market/tickers?q=${encodeURIComponent(value)}`).then((r) => {
+    api.get(`/market/search?q=${encodeURIComponent(value)}&limit=5&with_price=false`).then((r) => {
       const hit = (r.data || []).find((t) => t.symbol === value);
       setSelected(hit || { symbol: value, name: value });
     }).catch(()=>setSelected({ symbol: value, name: value }));
@@ -105,25 +111,44 @@ export default function InstrumentPicker({ value, onChange, restrictTo, placehol
               {restrictTo ? "Portföyünüzde eşleşen hisse yok." : `"${q}" için sonuç bulunamadı.`}
             </div>
           )}
-          {!loading && filtered.slice(0, 30).map((t) => (
-            <button
-              key={t.symbol}
-              type="button"
-              onClick={() => pick(t)}
-              className={`w-full flex items-center gap-3 px-3 py-2 text-left hover:bg-surface transition-colors ${value === t.symbol ? "bg-brand-soft/60" : ""}`}
-              data-testid={`${testIdPrefix}-row-${t.symbol}`}
-            >
-              <span className="h-8 w-8 rounded-lg text-[11px] flex items-center justify-center font-heading font-bold shrink-0" style={{ background: t.logo_bg, color: t.logo_fg }}>
-                {t.symbol.slice(0, 2)}
-              </span>
-              <div className="min-w-0 flex-1">
-                <div className="font-heading font-semibold text-sm">{t.symbol}</div>
-                <div className="text-xs text-mute truncate">{t.name}</div>
-              </div>
-              <span className="text-[10px] uppercase tracking-wider text-mute font-medium shrink-0">{t.sector}</span>
-              {value === t.symbol && <Check size={14} className="text-brand shrink-0"/>}
-            </button>
-          ))}
+          {!loading && filtered.slice(0, 30).map((t) => {
+            const up = (t.change_pct ?? 0) >= 0;
+            const hasPrice = t.price_available;
+            return (
+              <button
+                key={t.symbol}
+                type="button"
+                onClick={() => pick(t)}
+                className={`w-full flex items-center gap-3 px-3 py-2 text-left hover:bg-surface transition-colors ${value === t.symbol ? "bg-brand-soft/60" : ""}`}
+                data-testid={`${testIdPrefix}-row-${t.symbol}`}
+              >
+                <span className="h-8 w-8 rounded-lg text-[11px] flex items-center justify-center font-heading font-bold shrink-0" style={{ background: t.logo_bg, color: t.logo_fg }}>
+                  {t.symbol.slice(0, 2)}
+                </span>
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-center gap-2">
+                    <span className="font-heading font-semibold text-sm">{t.symbol}</span>
+                    {t.index && <span className="text-[9px] uppercase tracking-wider text-mute font-medium">{t.index}</span>}
+                  </div>
+                  <div className="text-xs text-mute truncate">{t.name}</div>
+                </div>
+                {hasPrice ? (
+                  <div className="text-right shrink-0">
+                    <div className="tabular text-xs font-medium">₺{num(t.price)}</div>
+                    <div className={`tabular text-[11px] font-semibold inline-flex items-center gap-0.5 ${up ? "text-pos" : "text-neg"}`}>
+                      {up ? <ArrowUpRight size={10}/> : <ArrowDownRight size={10}/>}
+                      {up ? "+" : ""}{num(t.change_pct)}%
+                    </div>
+                  </div>
+                ) : (
+                  t.price_source === null && q ? (
+                    <span className="text-[10px] text-mute shrink-0 italic max-w-[110px] text-right leading-tight">Piyasa verisi yok</span>
+                  ) : null
+                )}
+                {value === t.symbol && <Check size={14} className="text-brand shrink-0 ml-2"/>}
+              </button>
+            );
+          })}
         </div>
       )}
     </div>

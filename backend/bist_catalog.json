@@ -1,0 +1,3524 @@
+[
+ {
+  "symbol": "A1CAP",
+  "name": "A1 Capital Yatirim",
+  "index": "XUTUM",
+  "norm": "a1 capital yatirim"
+ },
+ {
+  "symbol": "A1YEN",
+  "name": "A1 Yenilenebilir Enerji",
+  "index": "XUTUM",
+  "norm": "a1 yenilenebilir enerji"
+ },
+ {
+  "symbol": "AAGYO",
+  "name": "Agaoglu Gmyo",
+  "index": "XUTUM",
+  "norm": "agaoglu gmyo"
+ },
+ {
+  "symbol": "ACSEL",
+  "name": "Acipayam Seluloz",
+  "index": "XUSIN",
+  "norm": "acipayam seluloz"
+ },
+ {
+  "symbol": "ADEL",
+  "name": "Adel Kalemcilik",
+  "index": "XUSIN",
+  "norm": "adel kalemcilik"
+ },
+ {
+  "symbol": "ADESE",
+  "name": "Adese Gayrimenkul",
+  "index": "XUTUM",
+  "norm": "adese gayrimenkul"
+ },
+ {
+  "symbol": "ADGYO",
+  "name": "Adra Gmyo",
+  "index": "XUTUM",
+  "norm": "adra gmyo"
+ },
+ {
+  "symbol": "AEFES",
+  "name": "Anadolu Efes",
+  "index": "XU030",
+  "norm": "anadolu efes"
+ },
+ {
+  "symbol": "AFYON",
+  "name": "Afyon Cimento",
+  "index": "XUSIN",
+  "norm": "afyon cimento"
+ },
+ {
+  "symbol": "AGESA",
+  "name": "Agesa Hayat Emeklilik",
+  "index": "XUTUM",
+  "norm": "agesa hayat emeklilik"
+ },
+ {
+  "symbol": "AGHOL",
+  "name": "Anadolu Grubu Holding",
+  "index": "XUTUM",
+  "norm": "anadolu grubu holding"
+ },
+ {
+  "symbol": "AGROT",
+  "name": "Agrotech Teknoloji",
+  "index": "XUSIN",
+  "norm": "agrotech teknoloji"
+ },
+ {
+  "symbol": "AGYO",
+  "name": "Atakule Gmyo",
+  "index": "XUTUM",
+  "norm": "atakule gmyo"
+ },
+ {
+  "symbol": "AHGAZ",
+  "name": "Ahlatci Dogalgaz",
+  "index": "XUTUM",
+  "norm": "ahlatci dogalgaz"
+ },
+ {
+  "symbol": "AHSGY",
+  "name": "Ahes Gmyo",
+  "index": "XUTUM",
+  "norm": "ahes gmyo"
+ },
+ {
+  "symbol": "AKBNK",
+  "name": "Akbank",
+  "index": "XU030",
+  "norm": "akbank"
+ },
+ {
+  "symbol": "AKCNS",
+  "name": "Akcansa",
+  "index": "XUSIN",
+  "norm": "akcansa"
+ },
+ {
+  "symbol": "AKENR",
+  "name": "Akenerji",
+  "index": "XUTUM",
+  "norm": "akenerji"
+ },
+ {
+  "symbol": "AKFGY",
+  "name": "Akfen Gmyo",
+  "index": "XUTUM",
+  "norm": "akfen gmyo"
+ },
+ {
+  "symbol": "AKFIS",
+  "name": "Akfen Insaat",
+  "index": "XUTUM",
+  "norm": "akfen insaat"
+ },
+ {
+  "symbol": "AKFYE",
+  "name": "Akfen Yen. Enerji",
+  "index": "XUTUM",
+  "norm": "akfen yen. enerji"
+ },
+ {
+  "symbol": "AKGRT",
+  "name": "Aksigorta",
+  "index": "XUTUM",
+  "norm": "aksigorta"
+ },
+ {
+  "symbol": "AKHAN",
+  "name": "Akhan Un",
+  "index": "XUSIN",
+  "norm": "akhan un"
+ },
+ {
+  "symbol": "AKMGY",
+  "name": "Akmerkez Gmyo",
+  "index": "XUTUM",
+  "norm": "akmerkez gmyo"
+ },
+ {
+  "symbol": "AKSA",
+  "name": "Aksa",
+  "index": "XU100",
+  "norm": "aksa"
+ },
+ {
+  "symbol": "AKSEN",
+  "name": "Aksa Enerji",
+  "index": "XU050",
+  "norm": "aksa enerji"
+ },
+ {
+  "symbol": "AKSGY",
+  "name": "Akis Gmyo",
+  "index": "XUTUM",
+  "norm": "akis gmyo"
+ },
+ {
+  "symbol": "AKSUE",
+  "name": "Aksu Enerji",
+  "index": "XUTUM",
+  "norm": "aksu enerji"
+ },
+ {
+  "symbol": "AKYHO",
+  "name": "Akdeniz Yatirim Holding",
+  "index": "XUTUM",
+  "norm": "akdeniz yatirim holding"
+ },
+ {
+  "symbol": "ALARK",
+  "name": "Alarko Holding",
+  "index": "XU050",
+  "norm": "alarko holding"
+ },
+ {
+  "symbol": "ALBRK",
+  "name": "Albaraka Turk",
+  "index": "XUTUM",
+  "norm": "albaraka turk"
+ },
+ {
+  "symbol": "ALBTN",
+  "name": "Albayrak Beton Sanayi",
+  "index": "XUSIN",
+  "norm": "albayrak beton sanayi"
+ },
+ {
+  "symbol": "ALCAR",
+  "name": "Alarko Carrier",
+  "index": "XUSIN",
+  "norm": "alarko carrier"
+ },
+ {
+  "symbol": "ALCTL",
+  "name": "Alcatel Lucent Teletas",
+  "index": "XUTUM",
+  "norm": "alcatel lucent teletas"
+ },
+ {
+  "symbol": "ALFAS",
+  "name": "Alfa Solar Enerji",
+  "index": "XUTUM",
+  "norm": "alfa solar enerji"
+ },
+ {
+  "symbol": "ALGYO",
+  "name": "Alarko Gmyo",
+  "index": "XUTUM",
+  "norm": "alarko gmyo"
+ },
+ {
+  "symbol": "ALKA",
+  "name": "Alkim Kagit",
+  "index": "XUSIN",
+  "norm": "alkim kagit"
+ },
+ {
+  "symbol": "ALKIM",
+  "name": "Alkim Kimya",
+  "index": "XUSIN",
+  "norm": "alkim kimya"
+ },
+ {
+  "symbol": "ALKLC",
+  "name": "Altinkilic Gida Ve Sut",
+  "index": "XUSIN",
+  "norm": "altinkilic gida ve sut"
+ },
+ {
+  "symbol": "ALTNY",
+  "name": "Altinay Savunma",
+  "index": "XU100",
+  "norm": "altinay savunma"
+ },
+ {
+  "symbol": "ALVES",
+  "name": "Alves Kablo",
+  "index": "XUSIN",
+  "norm": "alves kablo"
+ },
+ {
+  "symbol": "ANELE",
+  "name": "Anel Elektrik",
+  "index": "XUTUM",
+  "norm": "anel elektrik"
+ },
+ {
+  "symbol": "ANGEN",
+  "name": "Anatolia Tani Ve Biyoteknoloji",
+  "index": "XUSIN",
+  "norm": "anatolia tani ve biyoteknoloji"
+ },
+ {
+  "symbol": "ANHYT",
+  "name": "Anadolu Hayat Emek.",
+  "index": "XUTUM",
+  "norm": "anadolu hayat emek."
+ },
+ {
+  "symbol": "ANSGR",
+  "name": "Anadolu Sigorta",
+  "index": "XU100",
+  "norm": "anadolu sigorta"
+ },
+ {
+  "symbol": "ARASE",
+  "name": "Dogu Aras Enerji",
+  "index": "XUTUM",
+  "norm": "dogu aras enerji"
+ },
+ {
+  "symbol": "ARCLK",
+  "name": "Arcelik",
+  "index": "XU100",
+  "norm": "arcelik"
+ },
+ {
+  "symbol": "ARDYZ",
+  "name": "Ard Bilisim Teknolojileri",
+  "index": "XUTUM",
+  "norm": "ard bilisim teknolojileri"
+ },
+ {
+  "symbol": "ARENA",
+  "name": "Arena Bilgisayar",
+  "index": "XUTUM",
+  "norm": "arena bilgisayar"
+ },
+ {
+  "symbol": "ARFYE",
+  "name": "Arf Bio Yenilenebilir Enerji",
+  "index": "XUTUM",
+  "norm": "arf bio yenilenebilir enerji"
+ },
+ {
+  "symbol": "ARMGD",
+  "name": "Armada Gida",
+  "index": "XUSIN",
+  "norm": "armada gida"
+ },
+ {
+  "symbol": "ARSAN",
+  "name": "Arsan Holding",
+  "index": "XUTUM",
+  "norm": "arsan holding"
+ },
+ {
+  "symbol": "ARTMS",
+  "name": "Artemis Hali",
+  "index": "XUSIN",
+  "norm": "artemis hali"
+ },
+ {
+  "symbol": "ARZUM",
+  "name": "Arzum Ev Aletleri",
+  "index": "XUTUM",
+  "norm": "arzum ev aletleri"
+ },
+ {
+  "symbol": "ASELS",
+  "name": "Aselsan",
+  "index": "XU030",
+  "norm": "aselsan"
+ },
+ {
+  "symbol": "ASGYO",
+  "name": "Asce Gmyo",
+  "index": "XUTUM",
+  "norm": "asce gmyo"
+ },
+ {
+  "symbol": "ASTOR",
+  "name": "Astor Enerji",
+  "index": "XU030",
+  "norm": "astor enerji"
+ },
+ {
+  "symbol": "ASUZU",
+  "name": "Anadolu Isuzu",
+  "index": "XUSIN",
+  "norm": "anadolu isuzu"
+ },
+ {
+  "symbol": "ATAGY",
+  "name": "Ata Gmyo",
+  "index": "XUTUM",
+  "norm": "ata gmyo"
+ },
+ {
+  "symbol": "ATAKP",
+  "name": "Atakey Patates",
+  "index": "XUSIN",
+  "norm": "atakey patates"
+ },
+ {
+  "symbol": "ATATP",
+  "name": "Atp Yazilim",
+  "index": "XUTUM",
+  "norm": "atp yazilim"
+ },
+ {
+  "symbol": "ATATR",
+  "name": "Ata Turizm",
+  "index": "XUTUM",
+  "norm": "ata turizm"
+ },
+ {
+  "symbol": "ATLAS",
+  "name": "Atlas Yat. Ort.",
+  "index": "XYORT",
+  "norm": "atlas yat. ort."
+ },
+ {
+  "symbol": "AVGYO",
+  "name": "Avrasya Gmyo",
+  "index": "XUTUM",
+  "norm": "avrasya gmyo"
+ },
+ {
+  "symbol": "AVHOL",
+  "name": "Avrupa Yatirim Holding",
+  "index": "XUTUM",
+  "norm": "avrupa yatirim holding"
+ },
+ {
+  "symbol": "AVOD",
+  "name": "A.V.O.D Gida Ve Tarim",
+  "index": "XUSIN",
+  "norm": "a.v.o.d gida ve tarim"
+ },
+ {
+  "symbol": "AVPGY",
+  "name": "Avrupakent Gmyo",
+  "index": "XUTUM",
+  "norm": "avrupakent gmyo"
+ },
+ {
+  "symbol": "AVTUR",
+  "name": "Avrasya Petrol Ve Tur.",
+  "index": "XUTUM",
+  "norm": "avrasya petrol ve tur."
+ },
+ {
+  "symbol": "AYCES",
+  "name": "Altinyunus Cesme",
+  "index": "XUTUM",
+  "norm": "altinyunus cesme"
+ },
+ {
+  "symbol": "AYDEM",
+  "name": "Aydem Enerji",
+  "index": "XUTUM",
+  "norm": "aydem enerji"
+ },
+ {
+  "symbol": "AYEN",
+  "name": "Ayen Enerji",
+  "index": "XUTUM",
+  "norm": "ayen enerji"
+ },
+ {
+  "symbol": "AYGAZ",
+  "name": "Aygaz",
+  "index": "XUSIN",
+  "norm": "aygaz"
+ },
+ {
+  "symbol": "AZTEK",
+  "name": "Aztek Teknoloji",
+  "index": "XUTUM",
+  "norm": "aztek teknoloji"
+ },
+ {
+  "symbol": "BAGFS",
+  "name": "Bagfas",
+  "index": "XUSIN",
+  "norm": "bagfas"
+ },
+ {
+  "symbol": "BAHKM",
+  "name": "Bahadir Kimya",
+  "index": "XUSIN",
+  "norm": "bahadir kimya"
+ },
+ {
+  "symbol": "BAKAB",
+  "name": "Bak Ambalaj",
+  "index": "XUSIN",
+  "norm": "bak ambalaj"
+ },
+ {
+  "symbol": "BALSU",
+  "name": "Balsu Gida",
+  "index": "XU100",
+  "norm": "balsu gida"
+ },
+ {
+  "symbol": "BANVT",
+  "name": "Banvit",
+  "index": "XUSIN",
+  "norm": "banvit"
+ },
+ {
+  "symbol": "BASGZ",
+  "name": "Baskent Dogalgaz Gmyo",
+  "index": "XUTUM",
+  "norm": "baskent dogalgaz gmyo"
+ },
+ {
+  "symbol": "BAYRK",
+  "name": "Bayrak Taban Sanayi",
+  "index": "XUSIN",
+  "norm": "bayrak taban sanayi"
+ },
+ {
+  "symbol": "BEGYO",
+  "name": "Bati Ege Gmyo",
+  "index": "XUTUM",
+  "norm": "bati ege gmyo"
+ },
+ {
+  "symbol": "BERA",
+  "name": "Bera Holding",
+  "index": "XU100",
+  "norm": "bera holding"
+ },
+ {
+  "symbol": "BESLR",
+  "name": "Besler Gida",
+  "index": "XUSIN",
+  "norm": "besler gida"
+ },
+ {
+  "symbol": "BESTE",
+  "name": "Best Brands Enerji",
+  "index": "XUTUM",
+  "norm": "best brands enerji"
+ },
+ {
+  "symbol": "BETAE",
+  "name": "Beta Enerji Ve Teknoloji",
+  "index": "XUSIN",
+  "norm": "beta enerji ve teknoloji"
+ },
+ {
+  "symbol": "BEYAZ",
+  "name": "Beyaz Filo",
+  "index": "XUTUM",
+  "norm": "beyaz filo"
+ },
+ {
+  "symbol": "BFREN",
+  "name": "Bosch Fren Sistemleri",
+  "index": "XUSIN",
+  "norm": "bosch fren sistemleri"
+ },
+ {
+  "symbol": "BIENY",
+  "name": "Bien Yapi Urunleri",
+  "index": "XUSIN",
+  "norm": "bien yapi urunleri"
+ },
+ {
+  "symbol": "BIGCH",
+  "name": "Buyuk Sefler Bigchefs",
+  "index": "XUTUM",
+  "norm": "buyuk sefler bigchefs"
+ },
+ {
+  "symbol": "BIGEN",
+  "name": "Birlesim Grup Enerji",
+  "index": "XUTUM",
+  "norm": "birlesim grup enerji"
+ },
+ {
+  "symbol": "BIGTK",
+  "name": "Big Medya Teknoloji",
+  "index": "XUTUM",
+  "norm": "big medya teknoloji"
+ },
+ {
+  "symbol": "BIMAS",
+  "name": "Bim Magazalar",
+  "index": "XU030",
+  "norm": "bim magazalar"
+ },
+ {
+  "symbol": "BINBN",
+  "name": "Bin Ulasim Teknolojileri",
+  "index": "XUTUM",
+  "norm": "bin ulasim teknolojileri"
+ },
+ {
+  "symbol": "BINHO",
+  "name": "1000 Yatirimlar Hol.",
+  "index": "XUTUM",
+  "norm": "1000 yatirimlar hol."
+ },
+ {
+  "symbol": "BIOEN",
+  "name": "Biotrend Cevre Ve Enerji",
+  "index": "XUTUM",
+  "norm": "biotrend cevre ve enerji"
+ },
+ {
+  "symbol": "BIZIM",
+  "name": "Bizim Magazalari",
+  "index": "XUTUM",
+  "norm": "bizim magazalari"
+ },
+ {
+  "symbol": "BJKAS",
+  "name": "Besiktas Futbol Yat.",
+  "index": "XUTUM",
+  "norm": "besiktas futbol yat."
+ },
+ {
+  "symbol": "BLCYT",
+  "name": "Bilici Yatirim",
+  "index": "XUSIN",
+  "norm": "bilici yatirim"
+ },
+ {
+  "symbol": "BLUME",
+  "name": "Blume Metal Kimya",
+  "index": "XUSIN",
+  "norm": "blume metal kimya"
+ },
+ {
+  "symbol": "BMSCH",
+  "name": "Bms Celik Hasir",
+  "index": "XUSIN",
+  "norm": "bms celik hasir"
+ },
+ {
+  "symbol": "BMSTL",
+  "name": "Bms Birlesik Metal",
+  "index": "XUSIN",
+  "norm": "bms birlesik metal"
+ },
+ {
+  "symbol": "BNTAS",
+  "name": "Bantas Ambalaj",
+  "index": "XUSIN",
+  "norm": "bantas ambalaj"
+ },
+ {
+  "symbol": "BOBET",
+  "name": "Bogazici Beton Sanayi",
+  "index": "XUSIN",
+  "norm": "bogazici beton sanayi"
+ },
+ {
+  "symbol": "BORLS",
+  "name": "Borlease Otomotiv",
+  "index": "XUTUM",
+  "norm": "borlease otomotiv"
+ },
+ {
+  "symbol": "BORSK",
+  "name": "Bor Seker",
+  "index": "XUSIN",
+  "norm": "bor seker"
+ },
+ {
+  "symbol": "BOSSA",
+  "name": "Bossa",
+  "index": "XUSIN",
+  "norm": "bossa"
+ },
+ {
+  "symbol": "BRISA",
+  "name": "Brisa",
+  "index": "XUSIN",
+  "norm": "brisa"
+ },
+ {
+  "symbol": "BRKSN",
+  "name": "Berkosan Yalitim",
+  "index": "XUSIN",
+  "norm": "berkosan yalitim"
+ },
+ {
+  "symbol": "BRKVY",
+  "name": "Birikim Varlik Yonetim",
+  "index": "XUTUM",
+  "norm": "birikim varlik yonetim"
+ },
+ {
+  "symbol": "BRLSM",
+  "name": "Birlesim Muhendislik",
+  "index": "XUTUM",
+  "norm": "birlesim muhendislik"
+ },
+ {
+  "symbol": "BRSAN",
+  "name": "Borusan Boru Sanayi",
+  "index": "XU050",
+  "norm": "borusan boru sanayi"
+ },
+ {
+  "symbol": "BRYAT",
+  "name": "Borusan Yat. Paz.",
+  "index": "XU100",
+  "norm": "borusan yat. paz."
+ },
+ {
+  "symbol": "BSOKE",
+  "name": "Baticim Cimento",
+  "index": "XU100",
+  "norm": "baticim cimento"
+ },
+ {
+  "symbol": "BTCIM",
+  "name": "Baticim Bati Anadolu",
+  "index": "XU050",
+  "norm": "baticim bati anadolu"
+ },
+ {
+  "symbol": "BUCIM",
+  "name": "Bursa Cimento",
+  "index": "XUSIN",
+  "norm": "bursa cimento"
+ },
+ {
+  "symbol": "BULGS",
+  "name": "Bulls Gsyo",
+  "index": "XUTUM",
+  "norm": "bulls gsyo"
+ },
+ {
+  "symbol": "BURCE",
+  "name": "Burcelik",
+  "index": "XUSIN",
+  "norm": "burcelik"
+ },
+ {
+  "symbol": "BURVA",
+  "name": "Burcelik Vana",
+  "index": "XUSIN",
+  "norm": "burcelik vana"
+ },
+ {
+  "symbol": "BVSAN",
+  "name": "Bulbuloglu Vinc",
+  "index": "XUSIN",
+  "norm": "bulbuloglu vinc"
+ },
+ {
+  "symbol": "BYDNR",
+  "name": "Baydoner Restoranlari",
+  "index": "XUTUM",
+  "norm": "baydoner restoranlari"
+ },
+ {
+  "symbol": "CANTE",
+  "name": "Can2 Termik",
+  "index": "XU050",
+  "norm": "can2 termik"
+ },
+ {
+  "symbol": "CATES",
+  "name": "Cates Elektrik",
+  "index": "XUTUM",
+  "norm": "cates elektrik"
+ },
+ {
+  "symbol": "CCOLA",
+  "name": "Coca Cola Icecek",
+  "index": "XU050",
+  "norm": "coca cola icecek"
+ },
+ {
+  "symbol": "CELHA",
+  "name": "Celik Halat",
+  "index": "XUSIN",
+  "norm": "celik halat"
+ },
+ {
+  "symbol": "CEMAS",
+  "name": "Cemas Dokum",
+  "index": "XUSIN",
+  "norm": "cemas dokum"
+ },
+ {
+  "symbol": "CEMTS",
+  "name": "Cemtas",
+  "index": "XUSIN",
+  "norm": "cemtas"
+ },
+ {
+  "symbol": "CEMZY",
+  "name": "Cem Zeytin",
+  "index": "XUSIN",
+  "norm": "cem zeytin"
+ },
+ {
+  "symbol": "CEOEM",
+  "name": "Ceo Event Medya",
+  "index": "XUTUM",
+  "norm": "ceo event medya"
+ },
+ {
+  "symbol": "CGCAM",
+  "name": "Cagdas Cam",
+  "index": "XUSIN",
+  "norm": "cagdas cam"
+ },
+ {
+  "symbol": "CIMSA",
+  "name": "Cimsa",
+  "index": "XU050",
+  "norm": "cimsa"
+ },
+ {
+  "symbol": "CLEBI",
+  "name": "Celebi",
+  "index": "XUTUM",
+  "norm": "celebi"
+ },
+ {
+  "symbol": "CMBTN",
+  "name": "Cimbeton",
+  "index": "XUSIN",
+  "norm": "cimbeton"
+ },
+ {
+  "symbol": "CONSE",
+  "name": "Consus Enerji",
+  "index": "XUTUM",
+  "norm": "consus enerji"
+ },
+ {
+  "symbol": "COSMO",
+  "name": "Cosmos Yat. Holding",
+  "index": "XUTUM",
+  "norm": "cosmos yat. holding"
+ },
+ {
+  "symbol": "CRDFA",
+  "name": "Creditwest Faktoring",
+  "index": "XUTUM",
+  "norm": "creditwest faktoring"
+ },
+ {
+  "symbol": "CRFSA",
+  "name": "Carrefoursa",
+  "index": "XUTUM",
+  "norm": "carrefoursa"
+ },
+ {
+  "symbol": "CUSAN",
+  "name": "Cuhadaroglu Metal",
+  "index": "XUSIN",
+  "norm": "cuhadaroglu metal"
+ },
+ {
+  "symbol": "CVKMD",
+  "name": "Cvk Maden",
+  "index": "XU100",
+  "norm": "cvk maden"
+ },
+ {
+  "symbol": "CWENE",
+  "name": "Cw Enerji",
+  "index": "XU100",
+  "norm": "cw enerji"
+ },
+ {
+  "symbol": "DAGI",
+  "name": "Dagi Giyim",
+  "index": "XUSIN",
+  "norm": "dagi giyim"
+ },
+ {
+  "symbol": "DAPGM",
+  "name": "Dap Gayrimenkul",
+  "index": "XU100",
+  "norm": "dap gayrimenkul"
+ },
+ {
+  "symbol": "DARDL",
+  "name": "Dardanel",
+  "index": "XUSIN",
+  "norm": "dardanel"
+ },
+ {
+  "symbol": "DCTTR",
+  "name": "Dct Trading Dis Ticaret",
+  "index": "XUTUM",
+  "norm": "dct trading dis ticaret"
+ },
+ {
+  "symbol": "DENGE",
+  "name": "Denge Holding",
+  "index": "XUTUM",
+  "norm": "denge holding"
+ },
+ {
+  "symbol": "DERHL",
+  "name": "Derluks Yatirim Holding",
+  "index": "XUTUM",
+  "norm": "derluks yatirim holding"
+ },
+ {
+  "symbol": "DERIM",
+  "name": "Derimod",
+  "index": "XUSIN",
+  "norm": "derimod"
+ },
+ {
+  "symbol": "DESA",
+  "name": "Desa Deri",
+  "index": "XUSIN",
+  "norm": "desa deri"
+ },
+ {
+  "symbol": "DESPC",
+  "name": "Despec Bilgisayar",
+  "index": "XUTUM",
+  "norm": "despec bilgisayar"
+ },
+ {
+  "symbol": "DEVA",
+  "name": "Deva Holding",
+  "index": "XUSIN",
+  "norm": "deva holding"
+ },
+ {
+  "symbol": "DGATE",
+  "name": "Datagate Bilgisayar",
+  "index": "XUTUM",
+  "norm": "datagate bilgisayar"
+ },
+ {
+  "symbol": "DGGYO",
+  "name": "Dogus Gmyo",
+  "index": "XUTUM",
+  "norm": "dogus gmyo"
+ },
+ {
+  "symbol": "DGNMO",
+  "name": "Doganlar Mobilya",
+  "index": "XUSIN",
+  "norm": "doganlar mobilya"
+ },
+ {
+  "symbol": "DITAS",
+  "name": "Ditas Bdy",
+  "index": "XUSIN",
+  "norm": "ditas bdy"
+ },
+ {
+  "symbol": "DMRGD",
+  "name": "Dmr Unlu Mamuller",
+  "index": "XUSIN",
+  "norm": "dmr unlu mamuller"
+ },
+ {
+  "symbol": "DMSAS",
+  "name": "Demisas Dokum",
+  "index": "XUSIN",
+  "norm": "demisas dokum"
+ },
+ {
+  "symbol": "DNISI",
+  "name": "Dinamik Isi Makina Yalitim",
+  "index": "XUSIN",
+  "norm": "dinamik isi makina yalitim"
+ },
+ {
+  "symbol": "DOAS",
+  "name": "Dogus Otomotiv",
+  "index": "XU100",
+  "norm": "dogus otomotiv"
+ },
+ {
+  "symbol": "DOCO",
+  "name": "Do-Co",
+  "index": "XUTUM",
+  "norm": "do-co"
+ },
+ {
+  "symbol": "DOFER",
+  "name": "Dofer Yapi Malzemeleri",
+  "index": "XUSIN",
+  "norm": "dofer yapi malzemeleri"
+ },
+ {
+  "symbol": "DOFRB",
+  "name": "Dof Robotik",
+  "index": "XUTUM",
+  "norm": "dof robotik"
+ },
+ {
+  "symbol": "DOGUB",
+  "name": "Dogusan",
+  "index": "XUSIN",
+  "norm": "dogusan"
+ },
+ {
+  "symbol": "DOHOL",
+  "name": "Dogan Holding",
+  "index": "XU100",
+  "norm": "dogan holding"
+ },
+ {
+  "symbol": "DOKTA",
+  "name": "Doktas Dokumculuk",
+  "index": "XUSIN",
+  "norm": "doktas dokumculuk"
+ },
+ {
+  "symbol": "DSTKF",
+  "name": "Destek Finans Faktoring",
+  "index": "XU030",
+  "norm": "destek finans faktoring"
+ },
+ {
+  "symbol": "DUNYH",
+  "name": "Dunya Holding",
+  "index": "XUTUM",
+  "norm": "dunya holding"
+ },
+ {
+  "symbol": "DURDO",
+  "name": "Duran Dogan Basim",
+  "index": "XUSIN",
+  "norm": "duran dogan basim"
+ },
+ {
+  "symbol": "DURKN",
+  "name": "Durukan Sekerleme",
+  "index": "XUSIN",
+  "norm": "durukan sekerleme"
+ },
+ {
+  "symbol": "DYOBY",
+  "name": "Dyo Boya",
+  "index": "XUSIN",
+  "norm": "dyo boya"
+ },
+ {
+  "symbol": "DZGYO",
+  "name": "Deniz Gmyo",
+  "index": "XUTUM",
+  "norm": "deniz gmyo"
+ },
+ {
+  "symbol": "EBEBK",
+  "name": "Ebebek Magazacilik",
+  "index": "XUTUM",
+  "norm": "ebebek magazacilik"
+ },
+ {
+  "symbol": "ECILC",
+  "name": "Eczacibasi Ilac",
+  "index": "XU050",
+  "norm": "eczacibasi ilac"
+ },
+ {
+  "symbol": "ECOGR",
+  "name": "Ecogreen Enerji",
+  "index": "XUTUM",
+  "norm": "ecogreen enerji"
+ },
+ {
+  "symbol": "ECZYT",
+  "name": "Eczacibasi Yatirim",
+  "index": "XUTUM",
+  "norm": "eczacibasi yatirim"
+ },
+ {
+  "symbol": "EDATA",
+  "name": "E-Data Teknoloji",
+  "index": "XUTUM",
+  "norm": "e-data teknoloji"
+ },
+ {
+  "symbol": "EDIP",
+  "name": "Edip Gayrimenkul",
+  "index": "XUTUM",
+  "norm": "edip gayrimenkul"
+ },
+ {
+  "symbol": "EFOR",
+  "name": "Efor Yatirim",
+  "index": "XU050",
+  "norm": "efor yatirim"
+ },
+ {
+  "symbol": "EGEEN",
+  "name": "Ege Endustri",
+  "index": "XUSIN",
+  "norm": "ege endustri"
+ },
+ {
+  "symbol": "EGEGY",
+  "name": "Egeyapi Avrupa Gmyo",
+  "index": "XUTUM",
+  "norm": "egeyapi avrupa gmyo"
+ },
+ {
+  "symbol": "EGEPO",
+  "name": "Nasmed Egepol",
+  "index": "XUTUM",
+  "norm": "nasmed egepol"
+ },
+ {
+  "symbol": "EGGUB",
+  "name": "Ege Gubre",
+  "index": "XUSIN",
+  "norm": "ege gubre"
+ },
+ {
+  "symbol": "EGPRO",
+  "name": "Ege Profil",
+  "index": "XUSIN",
+  "norm": "ege profil"
+ },
+ {
+  "symbol": "EGSER",
+  "name": "Ege Seramik",
+  "index": "XUSIN",
+  "norm": "ege seramik"
+ },
+ {
+  "symbol": "EKDMR",
+  "name": "Ekinciler Demir Celik",
+  "index": "XUSIN",
+  "norm": "ekinciler demir celik"
+ },
+ {
+  "symbol": "EKGYO",
+  "name": "Emlak Konut Gmyo",
+  "index": "XU030",
+  "norm": "emlak konut gmyo"
+ },
+ {
+  "symbol": "EKIM",
+  "name": "Ekim Turizm",
+  "index": "XUTUM",
+  "norm": "ekim turizm"
+ },
+ {
+  "symbol": "EKOS",
+  "name": "Ekos Teknoloji",
+  "index": "XUSIN",
+  "norm": "ekos teknoloji"
+ },
+ {
+  "symbol": "EKSUN",
+  "name": "Eksun Gida",
+  "index": "XUSIN",
+  "norm": "eksun gida"
+ },
+ {
+  "symbol": "ELITE",
+  "name": "Elite Naturel Organik Gida",
+  "index": "XUSIN",
+  "norm": "elite naturel organik gida"
+ },
+ {
+  "symbol": "EMKEL",
+  "name": "Emek Elektrik",
+  "index": "XUSIN",
+  "norm": "emek elektrik"
+ },
+ {
+  "symbol": "EMPAE",
+  "name": "Empa Elektronik",
+  "index": "XUTUM",
+  "norm": "empa elektronik"
+ },
+ {
+  "symbol": "ENDAE",
+  "name": "Enda Enerji Holding",
+  "index": "XUTUM",
+  "norm": "enda enerji holding"
+ },
+ {
+  "symbol": "ENERY",
+  "name": "Enerya Enerji",
+  "index": "XU100",
+  "norm": "enerya enerji"
+ },
+ {
+  "symbol": "ENJSA",
+  "name": "Enerjisa Enerji",
+  "index": "XU100",
+  "norm": "enerjisa enerji"
+ },
+ {
+  "symbol": "ENKAI",
+  "name": "Enka Insaat",
+  "index": "XU030",
+  "norm": "enka insaat"
+ },
+ {
+  "symbol": "ENSRI",
+  "name": "Ensari Sinai Yatirimlar",
+  "index": "XUSIN",
+  "norm": "ensari sinai yatirimlar"
+ },
+ {
+  "symbol": "ENTRA",
+  "name": "Ic Enterra Yen. Enerji",
+  "index": "XUTUM",
+  "norm": "ic enterra yen. enerji"
+ },
+ {
+  "symbol": "EPLAS",
+  "name": "Egeplast",
+  "index": "XUSIN",
+  "norm": "egeplast"
+ },
+ {
+  "symbol": "ERBOS",
+  "name": "Erbosan",
+  "index": "XUSIN",
+  "norm": "erbosan"
+ },
+ {
+  "symbol": "ERCB",
+  "name": "Erciyas Celik Boru",
+  "index": "XUSIN",
+  "norm": "erciyas celik boru"
+ },
+ {
+  "symbol": "EREGL",
+  "name": "Eregli Demir Celik",
+  "index": "XU030",
+  "norm": "eregli demir celik"
+ },
+ {
+  "symbol": "ERSU",
+  "name": "Ersu Gida",
+  "index": "XUSIN",
+  "norm": "ersu gida"
+ },
+ {
+  "symbol": "ESCAR",
+  "name": "Escar Filo",
+  "index": "XUTUM",
+  "norm": "escar filo"
+ },
+ {
+  "symbol": "ESCOM",
+  "name": "Escort Teknoloji",
+  "index": "XUTUM",
+  "norm": "escort teknoloji"
+ },
+ {
+  "symbol": "ESEN",
+  "name": "Esenboga Elektrik",
+  "index": "XU100",
+  "norm": "esenboga elektrik"
+ },
+ {
+  "symbol": "ETILR",
+  "name": "Etiler Gida",
+  "index": "XUTUM",
+  "norm": "etiler gida"
+ },
+ {
+  "symbol": "ETYAT",
+  "name": "Euro Trend Yat. Ort.",
+  "index": "XYORT",
+  "norm": "euro trend yat. ort."
+ },
+ {
+  "symbol": "EUKYO",
+  "name": "Euro Kapital Yat. Ort.",
+  "index": "XYORT",
+  "norm": "euro kapital yat. ort."
+ },
+ {
+  "symbol": "EUPWR",
+  "name": "Europower Enerji",
+  "index": "XU100",
+  "norm": "europower enerji"
+ },
+ {
+  "symbol": "EUREN",
+  "name": "Europen Endustri",
+  "index": "XU100",
+  "norm": "europen endustri"
+ },
+ {
+  "symbol": "EUYO",
+  "name": "Euro Yat. Ort.",
+  "index": "XYORT",
+  "norm": "euro yat. ort."
+ },
+ {
+  "symbol": "EYGYO",
+  "name": "Eyg Gmyo",
+  "index": "XUTUM",
+  "norm": "eyg gmyo"
+ },
+ {
+  "symbol": "FADE",
+  "name": "Fade Gida",
+  "index": "XUSIN",
+  "norm": "fade gida"
+ },
+ {
+  "symbol": "FENER",
+  "name": "Fenerbahce Futbol",
+  "index": "XU100",
+  "norm": "fenerbahce futbol"
+ },
+ {
+  "symbol": "FLAP",
+  "name": "Flap Kongre Toplanti Hiz.",
+  "index": "XUTUM",
+  "norm": "flap kongre toplanti hiz."
+ },
+ {
+  "symbol": "FMIZP",
+  "name": "F-M Izmit Piston",
+  "index": "XUSIN",
+  "norm": "f-m izmit piston"
+ },
+ {
+  "symbol": "FONET",
+  "name": "Fonet Bilgi Teknolojileri",
+  "index": "XUTUM",
+  "norm": "fonet bilgi teknolojileri"
+ },
+ {
+  "symbol": "FORMT",
+  "name": "Formet Metal Ve Cam",
+  "index": "XUSIN",
+  "norm": "formet metal ve cam"
+ },
+ {
+  "symbol": "FORTE",
+  "name": "Forte Bilgi Iletisim",
+  "index": "XUTUM",
+  "norm": "forte bilgi iletisim"
+ },
+ {
+  "symbol": "FRIGO",
+  "name": "Frigo Pak Gida",
+  "index": "XUSIN",
+  "norm": "frigo pak gida"
+ },
+ {
+  "symbol": "FRMPL",
+  "name": "Formul Plastik Ve Metal",
+  "index": "XUSIN",
+  "norm": "formul plastik ve metal"
+ },
+ {
+  "symbol": "FROTO",
+  "name": "Ford Otosan",
+  "index": "XU030",
+  "norm": "ford otosan"
+ },
+ {
+  "symbol": "FZLGY",
+  "name": "Fuzul Gmyo",
+  "index": "XUTUM",
+  "norm": "fuzul gmyo"
+ },
+ {
+  "symbol": "GARAN",
+  "name": "Garanti Bankasi",
+  "index": "XU030",
+  "norm": "garanti bankasi"
+ },
+ {
+  "symbol": "GARFA",
+  "name": "Garanti Faktoring",
+  "index": "XUTUM",
+  "norm": "garanti faktoring"
+ },
+ {
+  "symbol": "GEDIK",
+  "name": "Gedik Y. Men. Deg.",
+  "index": "XUTUM",
+  "norm": "gedik y. men. deg."
+ },
+ {
+  "symbol": "GEDZA",
+  "name": "Gediz Ambalaj",
+  "index": "XUSIN",
+  "norm": "gediz ambalaj"
+ },
+ {
+  "symbol": "GENIL",
+  "name": "Gen Ilac",
+  "index": "XU100",
+  "norm": "gen ilac"
+ },
+ {
+  "symbol": "GENKM",
+  "name": "Gentas Kimya",
+  "index": "XUSIN",
+  "norm": "gentas kimya"
+ },
+ {
+  "symbol": "GENTS",
+  "name": "Gentas",
+  "index": "XUSIN",
+  "norm": "gentas"
+ },
+ {
+  "symbol": "GEREL",
+  "name": "Gersan Elektrik",
+  "index": "XUSIN",
+  "norm": "gersan elektrik"
+ },
+ {
+  "symbol": "GESAN",
+  "name": "Girisim Elektrik Sanayi",
+  "index": "XU100",
+  "norm": "girisim elektrik sanayi"
+ },
+ {
+  "symbol": "GIPTA",
+  "name": "Gipta Ofis Kirtasiye",
+  "index": "XUSIN",
+  "norm": "gipta ofis kirtasiye"
+ },
+ {
+  "symbol": "GLBMD",
+  "name": "Global Men. Deg.",
+  "index": "XUTUM",
+  "norm": "global men. deg."
+ },
+ {
+  "symbol": "GLCVY",
+  "name": "Gelecek Varlik Yonetimi",
+  "index": "XUTUM",
+  "norm": "gelecek varlik yonetimi"
+ },
+ {
+  "symbol": "GLRMK",
+  "name": "Gulermak Agir Sanayi",
+  "index": "XU050",
+  "norm": "gulermak agir sanayi"
+ },
+ {
+  "symbol": "GLRYH",
+  "name": "Guler Yat. Holding",
+  "index": "XUTUM",
+  "norm": "guler yat. holding"
+ },
+ {
+  "symbol": "GLYHO",
+  "name": "Global Yat. Holding",
+  "index": "XUTUM",
+  "norm": "global yat. holding"
+ },
+ {
+  "symbol": "GMTAS",
+  "name": "Gimat Magazacilik",
+  "index": "XUTUM",
+  "norm": "gimat magazacilik"
+ },
+ {
+  "symbol": "GOKNR",
+  "name": "Goknur Gida",
+  "index": "XUSIN",
+  "norm": "goknur gida"
+ },
+ {
+  "symbol": "GOLDA",
+  "name": "Golda Gida",
+  "index": "XUSIN",
+  "norm": "golda gida"
+ },
+ {
+  "symbol": "GOLTS",
+  "name": "Goltas Cimento",
+  "index": "XUSIN",
+  "norm": "goltas cimento"
+ },
+ {
+  "symbol": "GOODY",
+  "name": "Good-Year",
+  "index": "XUSIN",
+  "norm": "good-year"
+ },
+ {
+  "symbol": "GOZDE",
+  "name": "Gozde Girisim",
+  "index": "XUTUM",
+  "norm": "gozde girisim"
+ },
+ {
+  "symbol": "GRNYO",
+  "name": "Garanti Yat. Ort.",
+  "index": "XYORT",
+  "norm": "garanti yat. ort."
+ },
+ {
+  "symbol": "GRSEL",
+  "name": "Gur-Sel Turizm Tasimacilik",
+  "index": "XU100",
+  "norm": "gur-sel turizm tasimacilik"
+ },
+ {
+  "symbol": "GRTHO",
+  "name": "Grainturk Holding",
+  "index": "XU100",
+  "norm": "grainturk holding"
+ },
+ {
+  "symbol": "GSDDE",
+  "name": "Gsd Denizcilik",
+  "index": "XUTUM",
+  "norm": "gsd denizcilik"
+ },
+ {
+  "symbol": "GSDHO",
+  "name": "Gsd Holding",
+  "index": "XUTUM",
+  "norm": "gsd holding"
+ },
+ {
+  "symbol": "GSRAY",
+  "name": "Galatasaray Sportif",
+  "index": "XU100",
+  "norm": "galatasaray sportif"
+ },
+ {
+  "symbol": "GUBRF",
+  "name": "Gubre Fabrik.",
+  "index": "XU030",
+  "norm": "gubre fabrik."
+ },
+ {
+  "symbol": "GUNDG",
+  "name": "Gundogdu Gida",
+  "index": "XUSIN",
+  "norm": "gundogdu gida"
+ },
+ {
+  "symbol": "GWIND",
+  "name": "Galata Wind Enerji",
+  "index": "XUTUM",
+  "norm": "galata wind enerji"
+ },
+ {
+  "symbol": "GZNMI",
+  "name": "Gezinomi Seyahat",
+  "index": "XUTUM",
+  "norm": "gezinomi seyahat"
+ },
+ {
+  "symbol": "HALKB",
+  "name": "T. Halk Bankasi",
+  "index": "XU050",
+  "norm": "t. halk bankasi"
+ },
+ {
+  "symbol": "HATEK",
+  "name": "Hatay Tekstil",
+  "index": "XUSIN",
+  "norm": "hatay tekstil"
+ },
+ {
+  "symbol": "HATSN",
+  "name": "Hatsan Gemi",
+  "index": "XUSIN",
+  "norm": "hatsan gemi"
+ },
+ {
+  "symbol": "HDFGS",
+  "name": "Hedef Girisim",
+  "index": "XUTUM",
+  "norm": "hedef girisim"
+ },
+ {
+  "symbol": "HEDEF",
+  "name": "Hedef Holding",
+  "index": "XUTUM",
+  "norm": "hedef holding"
+ },
+ {
+  "symbol": "HEKTS",
+  "name": "Hektas",
+  "index": "XU050",
+  "norm": "hektas"
+ },
+ {
+  "symbol": "HKTM",
+  "name": "Hidropar Hareket Kontrol",
+  "index": "XUSIN",
+  "norm": "hidropar hareket kontrol"
+ },
+ {
+  "symbol": "HLGYO",
+  "name": "Halk Gmyo",
+  "index": "XUTUM",
+  "norm": "halk gmyo"
+ },
+ {
+  "symbol": "HOROZ",
+  "name": "Horoz Lojistik",
+  "index": "XUTUM",
+  "norm": "horoz lojistik"
+ },
+ {
+  "symbol": "HRKET",
+  "name": "Hareket Proje Tasimaciligi",
+  "index": "XUTUM",
+  "norm": "hareket proje tasimaciligi"
+ },
+ {
+  "symbol": "HTTBT",
+  "name": "Hitit Bilgisayar",
+  "index": "XUTUM",
+  "norm": "hitit bilgisayar"
+ },
+ {
+  "symbol": "HUBVC",
+  "name": "Hub Girisim",
+  "index": "XUTUM",
+  "norm": "hub girisim"
+ },
+ {
+  "symbol": "HUNER",
+  "name": "Hun Yenilenebilir Enerji",
+  "index": "XUTUM",
+  "norm": "hun yenilenebilir enerji"
+ },
+ {
+  "symbol": "HURGZ",
+  "name": "Hurriyet Gzt.",
+  "index": "XUTUM",
+  "norm": "hurriyet gzt."
+ },
+ {
+  "symbol": "ICBCT",
+  "name": "Icbc Turkey Bank",
+  "index": "XUTUM",
+  "norm": "icbc turkey bank"
+ },
+ {
+  "symbol": "ICUGS",
+  "name": "Icu Girisim",
+  "index": "XUTUM",
+  "norm": "icu girisim"
+ },
+ {
+  "symbol": "IDGYO",
+  "name": "Idealist Gmyo",
+  "index": "XUTUM",
+  "norm": "idealist gmyo"
+ },
+ {
+  "symbol": "IEYHO",
+  "name": "Isiklar Enerji Yapi Hol.",
+  "index": "XU100",
+  "norm": "isiklar enerji yapi hol."
+ },
+ {
+  "symbol": "IHAAS",
+  "name": "Ihlas Haber Ajansi",
+  "index": "XUTUM",
+  "norm": "ihlas haber ajansi"
+ },
+ {
+  "symbol": "IHEVA",
+  "name": "Ihlas Ev Aletleri",
+  "index": "XUSIN",
+  "norm": "ihlas ev aletleri"
+ },
+ {
+  "symbol": "IHGZT",
+  "name": "Ihlas Gazetecilik",
+  "index": "XUTUM",
+  "norm": "ihlas gazetecilik"
+ },
+ {
+  "symbol": "IHLAS",
+  "name": "Ihlas Holding",
+  "index": "XUTUM",
+  "norm": "ihlas holding"
+ },
+ {
+  "symbol": "IHLGM",
+  "name": "Ihlas Gayrimenkul",
+  "index": "XUTUM",
+  "norm": "ihlas gayrimenkul"
+ },
+ {
+  "symbol": "IHYAY",
+  "name": "Ihlas Yayin Holding",
+  "index": "XUTUM",
+  "norm": "ihlas yayin holding"
+ },
+ {
+  "symbol": "IMASM",
+  "name": "Imas Makina",
+  "index": "XUSIN",
+  "norm": "imas makina"
+ },
+ {
+  "symbol": "INDES",
+  "name": "Indeks Bilgisayar",
+  "index": "XUTUM",
+  "norm": "indeks bilgisayar"
+ },
+ {
+  "symbol": "INFO",
+  "name": "Info Yatirim",
+  "index": "XUTUM",
+  "norm": "info yatirim"
+ },
+ {
+  "symbol": "INGRM",
+  "name": "Ingram Bilisim",
+  "index": "XUTUM",
+  "norm": "ingram bilisim"
+ },
+ {
+  "symbol": "INTEM",
+  "name": "Intema",
+  "index": "XUTUM",
+  "norm": "intema"
+ },
+ {
+  "symbol": "INVEO",
+  "name": "Inveo Yatirim Holding",
+  "index": "XUTUM",
+  "norm": "inveo yatirim holding"
+ },
+ {
+  "symbol": "INVES",
+  "name": "Investco Holding",
+  "index": "XUTUM",
+  "norm": "investco holding"
+ },
+ {
+  "symbol": "ISATR",
+  "name": "Is Bankasi (A)",
+  "index": "XUTUM",
+  "norm": "is bankasi (a)"
+ },
+ {
+  "symbol": "ISBTR",
+  "name": "Is Bankasi (B)",
+  "index": "XUTUM",
+  "norm": "is bankasi (b)"
+ },
+ {
+  "symbol": "ISCTR",
+  "name": "Is Bankasi (C)",
+  "index": "XU030",
+  "norm": "is bankasi (c)"
+ },
+ {
+  "symbol": "ISDMR",
+  "name": "Iskenderun Demir Celik",
+  "index": "XUSIN",
+  "norm": "iskenderun demir celik"
+ },
+ {
+  "symbol": "ISFIN",
+  "name": "Is Fin.Kir.",
+  "index": "XUTUM",
+  "norm": "is fin.kir."
+ },
+ {
+  "symbol": "ISGSY",
+  "name": "Is Girisim",
+  "index": "XUTUM",
+  "norm": "is girisim"
+ },
+ {
+  "symbol": "ISGYO",
+  "name": "Is Gmyo",
+  "index": "XUTUM",
+  "norm": "is gmyo"
+ },
+ {
+  "symbol": "ISKPL",
+  "name": "Isik Plastik",
+  "index": "XUSIN",
+  "norm": "isik plastik"
+ },
+ {
+  "symbol": "ISMEN",
+  "name": "Is Y. Men. Deg.",
+  "index": "XU100",
+  "norm": "is y. men. deg."
+ },
+ {
+  "symbol": "ISSEN",
+  "name": "Isbir Sentetik Dokuma",
+  "index": "XUSIN",
+  "norm": "isbir sentetik dokuma"
+ },
+ {
+  "symbol": "ISVEA",
+  "name": "Isvea Seramik Ve Banyo",
+  "index": "XUSIN",
+  "norm": "isvea seramik ve banyo"
+ },
+ {
+  "symbol": "ISYAT",
+  "name": "Is Yat. Ort.",
+  "index": "XYORT",
+  "norm": "is yat. ort."
+ },
+ {
+  "symbol": "IZENR",
+  "name": "Izdemir Enerji",
+  "index": "XU100",
+  "norm": "izdemir enerji"
+ },
+ {
+  "symbol": "IZFAS",
+  "name": "Izmir Firca",
+  "index": "XUSIN",
+  "norm": "izmir firca"
+ },
+ {
+  "symbol": "IZINV",
+  "name": "Iz Yatirim Holding",
+  "index": "XUSIN",
+  "norm": "iz yatirim holding"
+ },
+ {
+  "symbol": "IZMDC",
+  "name": "Izmir Demir Celik",
+  "index": "XUSIN",
+  "norm": "izmir demir celik"
+ },
+ {
+  "symbol": "JANTS",
+  "name": "Jantsa Jant Sanayi",
+  "index": "XUSIN",
+  "norm": "jantsa jant sanayi"
+ },
+ {
+  "symbol": "KAPLM",
+  "name": "Kaplamin",
+  "index": "XUSIN",
+  "norm": "kaplamin"
+ },
+ {
+  "symbol": "KARCL",
+  "name": "Kardemir Celik",
+  "index": "XUSIN",
+  "norm": "kardemir celik"
+ },
+ {
+  "symbol": "KAREL",
+  "name": "Karel Elektronik",
+  "index": "XUTUM",
+  "norm": "karel elektronik"
+ },
+ {
+  "symbol": "KARSN",
+  "name": "Karsan Otomotiv",
+  "index": "XUSIN",
+  "norm": "karsan otomotiv"
+ },
+ {
+  "symbol": "KARTN",
+  "name": "Kartonsan",
+  "index": "XUSIN",
+  "norm": "kartonsan"
+ },
+ {
+  "symbol": "KATMR",
+  "name": "Katmerciler Ekipman",
+  "index": "XUSIN",
+  "norm": "katmerciler ekipman"
+ },
+ {
+  "symbol": "KAYSE",
+  "name": "Kayseri Seker Fabrikasi",
+  "index": "XUSIN",
+  "norm": "kayseri seker fabrikasi"
+ },
+ {
+  "symbol": "KBORU",
+  "name": "Kuzey Boru",
+  "index": "XUSIN",
+  "norm": "kuzey boru"
+ },
+ {
+  "symbol": "KCAER",
+  "name": "Kocaer Celik",
+  "index": "XUSIN",
+  "norm": "kocaer celik"
+ },
+ {
+  "symbol": "KCHOL",
+  "name": "Koc Holding",
+  "index": "XU030",
+  "norm": "koc holding"
+ },
+ {
+  "symbol": "KFEIN",
+  "name": "Kafein Yazilim",
+  "index": "XUTUM",
+  "norm": "kafein yazilim"
+ },
+ {
+  "symbol": "KGYO",
+  "name": "Koray Gmyo",
+  "index": "XUTUM",
+  "norm": "koray gmyo"
+ },
+ {
+  "symbol": "KIMMR",
+  "name": "Kim Market-Ersan Alisveris",
+  "index": "XUTUM",
+  "norm": "kim market-ersan alisveris"
+ },
+ {
+  "symbol": "KLGYO",
+  "name": "Kiler Gmyo",
+  "index": "XUTUM",
+  "norm": "kiler gmyo"
+ },
+ {
+  "symbol": "KLKIM",
+  "name": "Kalekim Kimyevi Maddeler",
+  "index": "XUSIN",
+  "norm": "kalekim kimyevi maddeler"
+ },
+ {
+  "symbol": "KLMSN",
+  "name": "Klimasan Klima",
+  "index": "XUSIN",
+  "norm": "klimasan klima"
+ },
+ {
+  "symbol": "KLRHO",
+  "name": "Kiler Holding",
+  "index": "XU100",
+  "norm": "kiler holding"
+ },
+ {
+  "symbol": "KLSER",
+  "name": "Kaleseramik",
+  "index": "XUSIN",
+  "norm": "kaleseramik"
+ },
+ {
+  "symbol": "KLSYN",
+  "name": "Koleksiyon Mobilya",
+  "index": "XUSIN",
+  "norm": "koleksiyon mobilya"
+ },
+ {
+  "symbol": "KLYPV",
+  "name": "Kalyon Gunes Teknolojileri",
+  "index": "XUTUM",
+  "norm": "kalyon gunes teknolojileri"
+ },
+ {
+  "symbol": "KMPUR",
+  "name": "Kimteks Poliuretan",
+  "index": "XUSIN",
+  "norm": "kimteks poliuretan"
+ },
+ {
+  "symbol": "KNFRT",
+  "name": "Konfrut Tarim",
+  "index": "XUSIN",
+  "norm": "konfrut tarim"
+ },
+ {
+  "symbol": "KOCMT",
+  "name": "Koc Metalurji",
+  "index": "XUSIN",
+  "norm": "koc metalurji"
+ },
+ {
+  "symbol": "KONKA",
+  "name": "Konya Kagit",
+  "index": "XUSIN",
+  "norm": "konya kagit"
+ },
+ {
+  "symbol": "KONYA",
+  "name": "Konya Cimento",
+  "index": "XUSIN",
+  "norm": "konya cimento"
+ },
+ {
+  "symbol": "KOPOL",
+  "name": "Koza Polyester",
+  "index": "XUSIN",
+  "norm": "koza polyester"
+ },
+ {
+  "symbol": "KORDS",
+  "name": "Kordsa Teknik Tekstil",
+  "index": "XUSIN",
+  "norm": "kordsa teknik tekstil"
+ },
+ {
+  "symbol": "KOTON",
+  "name": "Koton Magazacilik",
+  "index": "XUTUM",
+  "norm": "koton magazacilik"
+ },
+ {
+  "symbol": "KRDMA",
+  "name": "Kardemir (A)",
+  "index": "XUSIN",
+  "norm": "kardemir (a)"
+ },
+ {
+  "symbol": "KRDMB",
+  "name": "Kardemir (B)",
+  "index": "XUSIN",
+  "norm": "kardemir (b)"
+ },
+ {
+  "symbol": "KRDMD",
+  "name": "Kardemir (D)",
+  "index": "XU030",
+  "norm": "kardemir (d)"
+ },
+ {
+  "symbol": "KRGYO",
+  "name": "Korfez Gmyo",
+  "index": "XUTUM",
+  "norm": "korfez gmyo"
+ },
+ {
+  "symbol": "KRONT",
+  "name": "Kron Teknoloji",
+  "index": "XUTUM",
+  "norm": "kron teknoloji"
+ },
+ {
+  "symbol": "KRPLS",
+  "name": "Koroplast Temizlik Ambalaj",
+  "index": "XUSIN",
+  "norm": "koroplast temizlik ambalaj"
+ },
+ {
+  "symbol": "KRSTL",
+  "name": "Kristal Kola",
+  "index": "XUSIN",
+  "norm": "kristal kola"
+ },
+ {
+  "symbol": "KRTEK",
+  "name": "Karsu Tekstil",
+  "index": "XUSIN",
+  "norm": "karsu tekstil"
+ },
+ {
+  "symbol": "KRVGD",
+  "name": "Kervan Gida",
+  "index": "XUSIN",
+  "norm": "kervan gida"
+ },
+ {
+  "symbol": "KTLEV",
+  "name": "Katilimevim Tas. Fin.",
+  "index": "XU050",
+  "norm": "katilimevim tas. fin."
+ },
+ {
+  "symbol": "KTSKR",
+  "name": "Kutahya Seker Fabrikasi",
+  "index": "XUSIN",
+  "norm": "kutahya seker fabrikasi"
+ },
+ {
+  "symbol": "KUTPO",
+  "name": "Kutahya Porselen",
+  "index": "XUSIN",
+  "norm": "kutahya porselen"
+ },
+ {
+  "symbol": "KUVVA",
+  "name": "Kuvva Gida",
+  "index": "XUTUM",
+  "norm": "kuvva gida"
+ },
+ {
+  "symbol": "KUYAS",
+  "name": "Kuyas Yatirim",
+  "index": "XU050",
+  "norm": "kuyas yatirim"
+ },
+ {
+  "symbol": "KZBGY",
+  "name": "Kizilbuk Gyo",
+  "index": "XUTUM",
+  "norm": "kizilbuk gyo"
+ },
+ {
+  "symbol": "KZGYO",
+  "name": "Kuzugrup Gmyo",
+  "index": "XUTUM",
+  "norm": "kuzugrup gmyo"
+ },
+ {
+  "symbol": "LIDER",
+  "name": "Ldr Turizm",
+  "index": "XUTUM",
+  "norm": "ldr turizm"
+ },
+ {
+  "symbol": "LIDFA",
+  "name": "Lider Faktoring",
+  "index": "XUTUM",
+  "norm": "lider faktoring"
+ },
+ {
+  "symbol": "LILAK",
+  "name": "Lila Kagit",
+  "index": "XUSIN",
+  "norm": "lila kagit"
+ },
+ {
+  "symbol": "LINK",
+  "name": "Link Bilgisayar",
+  "index": "XUTUM",
+  "norm": "link bilgisayar"
+ },
+ {
+  "symbol": "LKMNH",
+  "name": "Lokman Hekim Saglik",
+  "index": "XUTUM",
+  "norm": "lokman hekim saglik"
+ },
+ {
+  "symbol": "LMKDC",
+  "name": "Limak Dogu Anadolu",
+  "index": "XUSIN",
+  "norm": "limak dogu anadolu"
+ },
+ {
+  "symbol": "LOGO",
+  "name": "Logo Yazilim",
+  "index": "XUTUM",
+  "norm": "logo yazilim"
+ },
+ {
+  "symbol": "LRSHO",
+  "name": "Loras Holding",
+  "index": "XUTUM",
+  "norm": "loras holding"
+ },
+ {
+  "symbol": "LUKSK",
+  "name": "Luks Kadife",
+  "index": "XUSIN",
+  "norm": "luks kadife"
+ },
+ {
+  "symbol": "LXGYO",
+  "name": "Luxera Gmyo",
+  "index": "XUTUM",
+  "norm": "luxera gmyo"
+ },
+ {
+  "symbol": "LYDHO",
+  "name": "Lydia Holding",
+  "index": "XUTUM",
+  "norm": "lydia holding"
+ },
+ {
+  "symbol": "LYDYE",
+  "name": "Lydia Yesil Enerji",
+  "index": "XUTUM",
+  "norm": "lydia yesil enerji"
+ },
+ {
+  "symbol": "MAALT",
+  "name": "Marmaris Altinyunus",
+  "index": "XUTUM",
+  "norm": "marmaris altinyunus"
+ },
+ {
+  "symbol": "MACKO",
+  "name": "Mackolik Internet Hizmetleri",
+  "index": "XUTUM",
+  "norm": "mackolik internet hizmetleri"
+ },
+ {
+  "symbol": "MAGEN",
+  "name": "Margun Enerji",
+  "index": "XU100",
+  "norm": "margun enerji"
+ },
+ {
+  "symbol": "MAKIM",
+  "name": "Makim Makine",
+  "index": "XUSIN",
+  "norm": "makim makine"
+ },
+ {
+  "symbol": "MAKTK",
+  "name": "Makina Takim",
+  "index": "XUSIN",
+  "norm": "makina takim"
+ },
+ {
+  "symbol": "MANAS",
+  "name": "Manas Enerji Yonetimi",
+  "index": "XUTUM",
+  "norm": "manas enerji yonetimi"
+ },
+ {
+  "symbol": "MARBL",
+  "name": "Tureks Turunc Madencilik",
+  "index": "XUSIN",
+  "norm": "tureks turunc madencilik"
+ },
+ {
+  "symbol": "MARKA",
+  "name": "Marka Yatirim Holding",
+  "index": "XUTUM",
+  "norm": "marka yatirim holding"
+ },
+ {
+  "symbol": "MARMR",
+  "name": "Marmara Holding",
+  "index": "XUSIN",
+  "norm": "marmara holding"
+ },
+ {
+  "symbol": "MARTI",
+  "name": "Marti Otel",
+  "index": "XUTUM",
+  "norm": "marti otel"
+ },
+ {
+  "symbol": "MASFN",
+  "name": "Masfen Enerji",
+  "index": "XUTUM",
+  "norm": "masfen enerji"
+ },
+ {
+  "symbol": "MAVI",
+  "name": "Mavi Giyim",
+  "index": "XU100",
+  "norm": "mavi giyim"
+ },
+ {
+  "symbol": "MCARD",
+  "name": "Metropal Kurumsal Hizmetler",
+  "index": "XUTUM",
+  "norm": "metropal kurumsal hizmetler"
+ },
+ {
+  "symbol": "MEDTR",
+  "name": "Meditera Tibbi Malzeme",
+  "index": "XUSIN",
+  "norm": "meditera tibbi malzeme"
+ },
+ {
+  "symbol": "MEGMT",
+  "name": "Mega Metal",
+  "index": "XUSIN",
+  "norm": "mega metal"
+ },
+ {
+  "symbol": "MEKAG",
+  "name": "Meka Global Makine",
+  "index": "XUSIN",
+  "norm": "meka global makine"
+ },
+ {
+  "symbol": "MEPET",
+  "name": "Metro Petrol Ve Tesisleri",
+  "index": "XUTUM",
+  "norm": "metro petrol ve tesisleri"
+ },
+ {
+  "symbol": "MERCN",
+  "name": "Mercan Kimya",
+  "index": "XUSIN",
+  "norm": "mercan kimya"
+ },
+ {
+  "symbol": "MERIT",
+  "name": "Merit Turizm",
+  "index": "XUTUM",
+  "norm": "merit turizm"
+ },
+ {
+  "symbol": "MERKO",
+  "name": "Merko Gida",
+  "index": "XUSIN",
+  "norm": "merko gida"
+ },
+ {
+  "symbol": "METEN",
+  "name": "Metgun Enerji",
+  "index": "XUTUM",
+  "norm": "metgun enerji"
+ },
+ {
+  "symbol": "METRO",
+  "name": "Metro Holding",
+  "index": "XUTUM",
+  "norm": "metro holding"
+ },
+ {
+  "symbol": "MEYSU",
+  "name": "Meysu Gida",
+  "index": "XUSIN",
+  "norm": "meysu gida"
+ },
+ {
+  "symbol": "MGROS",
+  "name": "Migros Ticaret",
+  "index": "XU030",
+  "norm": "migros ticaret"
+ },
+ {
+  "symbol": "MHRGY",
+  "name": "Mhr Gmyo",
+  "index": "XUTUM",
+  "norm": "mhr gmyo"
+ },
+ {
+  "symbol": "MIATK",
+  "name": "Mia Teknoloji",
+  "index": "XU050",
+  "norm": "mia teknoloji"
+ },
+ {
+  "symbol": "MNDRS",
+  "name": "Menderes Tekstil",
+  "index": "XUSIN",
+  "norm": "menderes tekstil"
+ },
+ {
+  "symbol": "MNDTR",
+  "name": "Mondi Turkey",
+  "index": "XUSIN",
+  "norm": "mondi turkey"
+ },
+ {
+  "symbol": "MOBTL",
+  "name": "Mobiltel Iletisim",
+  "index": "XUTUM",
+  "norm": "mobiltel iletisim"
+ },
+ {
+  "symbol": "MOGAN",
+  "name": "Mogan Enerji",
+  "index": "XUTUM",
+  "norm": "mogan enerji"
+ },
+ {
+  "symbol": "MOPAS",
+  "name": "Mopas Marketcilik",
+  "index": "XUTUM",
+  "norm": "mopas marketcilik"
+ },
+ {
+  "symbol": "MPARK",
+  "name": "Mlp Saglik",
+  "index": "XU100",
+  "norm": "mlp saglik"
+ },
+ {
+  "symbol": "MRGYO",
+  "name": "Marti Gmyo",
+  "index": "XUTUM",
+  "norm": "marti gmyo"
+ },
+ {
+  "symbol": "MRSHL",
+  "name": "Marshall",
+  "index": "XUSIN",
+  "norm": "marshall"
+ },
+ {
+  "symbol": "MSGYO",
+  "name": "Mistral Gmyo",
+  "index": "XUTUM",
+  "norm": "mistral gmyo"
+ },
+ {
+  "symbol": "MTRKS",
+  "name": "Matriks Finansal Teknolojiler",
+  "index": "XUTUM",
+  "norm": "matriks finansal teknolojiler"
+ },
+ {
+  "symbol": "MTRYO",
+  "name": "Metro Yat. Ort.",
+  "index": "XYORT",
+  "norm": "metro yat. ort."
+ },
+ {
+  "symbol": "MZHLD",
+  "name": "Mazhar Zorlu Holding",
+  "index": "XUTUM",
+  "norm": "mazhar zorlu holding"
+ },
+ {
+  "symbol": "NATEN",
+  "name": "Naturel Enerji",
+  "index": "XUTUM",
+  "norm": "naturel enerji"
+ },
+ {
+  "symbol": "NETAS",
+  "name": "Netas Telekom.",
+  "index": "XUTUM",
+  "norm": "netas telekom."
+ },
+ {
+  "symbol": "NETCD",
+  "name": "Netcad Yazilim",
+  "index": "XUTUM",
+  "norm": "netcad yazilim"
+ },
+ {
+  "symbol": "NIBAS",
+  "name": "Nigbas Nigde Beton",
+  "index": "XUSIN",
+  "norm": "nigbas nigde beton"
+ },
+ {
+  "symbol": "NTGAZ",
+  "name": "Naturelgaz",
+  "index": "XUTUM",
+  "norm": "naturelgaz"
+ },
+ {
+  "symbol": "NTHOL",
+  "name": "Net Holding",
+  "index": "XUTUM",
+  "norm": "net holding"
+ },
+ {
+  "symbol": "NUGYO",
+  "name": "Nurol Gmyo",
+  "index": "XUTUM",
+  "norm": "nurol gmyo"
+ },
+ {
+  "symbol": "NUHCM",
+  "name": "Nuh Cimento",
+  "index": "XUSIN",
+  "norm": "nuh cimento"
+ },
+ {
+  "symbol": "OBAMS",
+  "name": "Oba Makarnacilik",
+  "index": "XU100",
+  "norm": "oba makarnacilik"
+ },
+ {
+  "symbol": "OBASE",
+  "name": "Obase Bilgisayar",
+  "index": "XUTUM",
+  "norm": "obase bilgisayar"
+ },
+ {
+  "symbol": "ODAS",
+  "name": "Odas Elektrik",
+  "index": "XU100",
+  "norm": "odas elektrik"
+ },
+ {
+  "symbol": "ODINE",
+  "name": "Odine Teknoloji",
+  "index": "XU100",
+  "norm": "odine teknoloji"
+ },
+ {
+  "symbol": "OFSYM",
+  "name": "Ofis Yem Gida",
+  "index": "XUSIN",
+  "norm": "ofis yem gida"
+ },
+ {
+  "symbol": "ONCSM",
+  "name": "Oncosem Onkolojik Sistemler",
+  "index": "XUSIN",
+  "norm": "oncosem onkolojik sistemler"
+ },
+ {
+  "symbol": "ONRYT",
+  "name": "Onur Teknoloji",
+  "index": "XUTUM",
+  "norm": "onur teknoloji"
+ },
+ {
+  "symbol": "ORCAY",
+  "name": "Orcay Ortakoy Cay Sanayi",
+  "index": "XUSIN",
+  "norm": "orcay ortakoy cay sanayi"
+ },
+ {
+  "symbol": "ORGE",
+  "name": "Orge Enerji Elektrik",
+  "index": "XUTUM",
+  "norm": "orge enerji elektrik"
+ },
+ {
+  "symbol": "ORZAX",
+  "name": "Orzaks Ilac",
+  "index": "XUSIN",
+  "norm": "orzaks ilac"
+ },
+ {
+  "symbol": "OSMEN",
+  "name": "Osmanli Menkul",
+  "index": "XUTUM",
+  "norm": "osmanli menkul"
+ },
+ {
+  "symbol": "OSTIM",
+  "name": "Ostim Endustriyel Yat",
+  "index": "XUTUM",
+  "norm": "ostim endustriyel yat"
+ },
+ {
+  "symbol": "OTKAR",
+  "name": "Otokar",
+  "index": "XU100",
+  "norm": "otokar"
+ },
+ {
+  "symbol": "OTTO",
+  "name": "Otto Holding",
+  "index": "XUTUM",
+  "norm": "otto holding"
+ },
+ {
+  "symbol": "OYAKC",
+  "name": "Oyak Cimento",
+  "index": "XU050",
+  "norm": "oyak cimento"
+ },
+ {
+  "symbol": "OYAYO",
+  "name": "Oyak Yat. Ort.",
+  "index": "XYORT",
+  "norm": "oyak yat. ort."
+ },
+ {
+  "symbol": "OYLUM",
+  "name": "Oylum Sinai Yatirimlar",
+  "index": "XUSIN",
+  "norm": "oylum sinai yatirimlar"
+ },
+ {
+  "symbol": "OYYAT",
+  "name": "Oyak Yatirim Menkul",
+  "index": "XUTUM",
+  "norm": "oyak yatirim menkul"
+ },
+ {
+  "symbol": "OZATD",
+  "name": "Ozata Denizcilik",
+  "index": "XUSIN",
+  "norm": "ozata denizcilik"
+ },
+ {
+  "symbol": "OZGYO",
+  "name": "Ozderici Gmyo",
+  "index": "XUTUM",
+  "norm": "ozderici gmyo"
+ },
+ {
+  "symbol": "OZKGY",
+  "name": "Ozak Gmyo",
+  "index": "XUTUM",
+  "norm": "ozak gmyo"
+ },
+ {
+  "symbol": "OZRDN",
+  "name": "Ozerden Ambalaj",
+  "index": "XUSIN",
+  "norm": "ozerden ambalaj"
+ },
+ {
+  "symbol": "OZSUB",
+  "name": "Ozsu Balik",
+  "index": "XUSIN",
+  "norm": "ozsu balik"
+ },
+ {
+  "symbol": "OZYSR",
+  "name": "Ozyasar Tel",
+  "index": "XUSIN",
+  "norm": "ozyasar tel"
+ },
+ {
+  "symbol": "PAGYO",
+  "name": "Panora Gmyo",
+  "index": "XUTUM",
+  "norm": "panora gmyo"
+ },
+ {
+  "symbol": "PAHOL",
+  "name": "Pasifik Holding",
+  "index": "XU100",
+  "norm": "pasifik holding"
+ },
+ {
+  "symbol": "PAMEL",
+  "name": "Pamel Elektrik",
+  "index": "XUTUM",
+  "norm": "pamel elektrik"
+ },
+ {
+  "symbol": "PAPIL",
+  "name": "Papilon Savunma",
+  "index": "XUTUM",
+  "norm": "papilon savunma"
+ },
+ {
+  "symbol": "PARSN",
+  "name": "Parsan",
+  "index": "XUSIN",
+  "norm": "parsan"
+ },
+ {
+  "symbol": "PASEU",
+  "name": "Pasifik Eurasia Lojistik",
+  "index": "XU050",
+  "norm": "pasifik eurasia lojistik"
+ },
+ {
+  "symbol": "PATEK",
+  "name": "Pasifik Teknoloji",
+  "index": "XU100",
+  "norm": "pasifik teknoloji"
+ },
+ {
+  "symbol": "PCILT",
+  "name": "Pc Iletisim Medya",
+  "index": "XUTUM",
+  "norm": "pc iletisim medya"
+ },
+ {
+  "symbol": "PEKGY",
+  "name": "Peker Gmyo",
+  "index": "XUTUM",
+  "norm": "peker gmyo"
+ },
+ {
+  "symbol": "PENGD",
+  "name": "Penguen Gida",
+  "index": "XUSIN",
+  "norm": "penguen gida"
+ },
+ {
+  "symbol": "PENTA",
+  "name": "Penta Teknoloji Urunleri Dagitim",
+  "index": "XUTUM",
+  "norm": "penta teknoloji urunleri dagitim"
+ },
+ {
+  "symbol": "PETKM",
+  "name": "Petkim",
+  "index": "XU030",
+  "norm": "petkim"
+ },
+ {
+  "symbol": "PETUN",
+  "name": "Pinar Et Ve Un",
+  "index": "XUSIN",
+  "norm": "pinar et ve un"
+ },
+ {
+  "symbol": "PGSUS",
+  "name": "Pegasus",
+  "index": "XU030",
+  "norm": "pegasus"
+ },
+ {
+  "symbol": "PINSU",
+  "name": "Pinar Su",
+  "index": "XUSIN",
+  "norm": "pinar su"
+ },
+ {
+  "symbol": "PKART",
+  "name": "Plastikkart",
+  "index": "XUTUM",
+  "norm": "plastikkart"
+ },
+ {
+  "symbol": "PKENT",
+  "name": "Petrokent Turizm",
+  "index": "XUTUM",
+  "norm": "petrokent turizm"
+ },
+ {
+  "symbol": "PLTUR",
+  "name": "Platform Turizm",
+  "index": "XUTUM",
+  "norm": "platform turizm"
+ },
+ {
+  "symbol": "PNLSN",
+  "name": "Panelsan Cati Cephe",
+  "index": "XUSIN",
+  "norm": "panelsan cati cephe"
+ },
+ {
+  "symbol": "PNSUT",
+  "name": "Pinar Sut",
+  "index": "XUSIN",
+  "norm": "pinar sut"
+ },
+ {
+  "symbol": "POLHO",
+  "name": "Polisan Holding",
+  "index": "XUTUM",
+  "norm": "polisan holding"
+ },
+ {
+  "symbol": "POLTK",
+  "name": "Politeknik Metal",
+  "index": "XUSIN",
+  "norm": "politeknik metal"
+ },
+ {
+  "symbol": "PRDGS",
+  "name": "Pardus Girisim",
+  "index": "XUTUM",
+  "norm": "pardus girisim"
+ },
+ {
+  "symbol": "PRKAB",
+  "name": "Turk Prysmian Kablo",
+  "index": "XUSIN",
+  "norm": "turk prysmian kablo"
+ },
+ {
+  "symbol": "PRKME",
+  "name": "Park Elek.Madencilik",
+  "index": "XUSIN",
+  "norm": "park elek.madencilik"
+ },
+ {
+  "symbol": "PRZMA",
+  "name": "Prizma Press Matbaacilik",
+  "index": "XUSIN",
+  "norm": "prizma press matbaacilik"
+ },
+ {
+  "symbol": "PSDTC",
+  "name": "Pergamon Dis Ticaret",
+  "index": "XUTUM",
+  "norm": "pergamon dis ticaret"
+ },
+ {
+  "symbol": "PSGYO",
+  "name": "Pasifik Gmyo",
+  "index": "XU100",
+  "norm": "pasifik gmyo"
+ },
+ {
+  "symbol": "QUAGR",
+  "name": "Qua Granite Hayal Yapi",
+  "index": "XU100",
+  "norm": "qua granite hayal yapi"
+ },
+ {
+  "symbol": "QUICK",
+  "name": "Quick Sigorta",
+  "index": "XUTUM",
+  "norm": "quick sigorta"
+ },
+ {
+  "symbol": "RALYH",
+  "name": "Ral Yatirim Holding",
+  "index": "XU100",
+  "norm": "ral yatirim holding"
+ },
+ {
+  "symbol": "RAYSG",
+  "name": "Ray Sigorta",
+  "index": "XUTUM",
+  "norm": "ray sigorta"
+ },
+ {
+  "symbol": "REEDR",
+  "name": "Reeder Teknoloji",
+  "index": "XU100",
+  "norm": "reeder teknoloji"
+ },
+ {
+  "symbol": "RGYAS",
+  "name": "Ronesans Gayrimenkul Yat.",
+  "index": "XUTUM",
+  "norm": "ronesans gayrimenkul yat."
+ },
+ {
+  "symbol": "RNPOL",
+  "name": "Rainbow Polikarbonat",
+  "index": "XUSIN",
+  "norm": "rainbow polikarbonat"
+ },
+ {
+  "symbol": "RODRG",
+  "name": "Rodrigo Tekstil",
+  "index": "XUSIN",
+  "norm": "rodrigo tekstil"
+ },
+ {
+  "symbol": "RTALB",
+  "name": "Rta Laboratuvarlari",
+  "index": "XUSIN",
+  "norm": "rta laboratuvarlari"
+ },
+ {
+  "symbol": "RUBNS",
+  "name": "Rubenis Tekstil",
+  "index": "XUSIN",
+  "norm": "rubenis tekstil"
+ },
+ {
+  "symbol": "RUZYE",
+  "name": "Ruzy Madencilik Ve Enerji",
+  "index": "XUSIN",
+  "norm": "ruzy madencilik ve enerji"
+ },
+ {
+  "symbol": "RYGYO",
+  "name": "Reysas Gmyo",
+  "index": "XUTUM",
+  "norm": "reysas gmyo"
+ },
+ {
+  "symbol": "RYSAS",
+  "name": "Reysas Lojistik",
+  "index": "XUTUM",
+  "norm": "reysas lojistik"
+ },
+ {
+  "symbol": "SAFKR",
+  "name": "Safkar Ege Sogutmacilik",
+  "index": "XUSIN",
+  "norm": "safkar ege sogutmacilik"
+ },
+ {
+  "symbol": "SAHOL",
+  "name": "Sabanci Holding",
+  "index": "XU030",
+  "norm": "sabanci holding"
+ },
+ {
+  "symbol": "SAMAT",
+  "name": "Saray Matbaacilik",
+  "index": "XUSIN",
+  "norm": "saray matbaacilik"
+ },
+ {
+  "symbol": "SANEL",
+  "name": "Sanel Muhendislik",
+  "index": "XUTUM",
+  "norm": "sanel muhendislik"
+ },
+ {
+  "symbol": "SANFM",
+  "name": "Sanifoam Endustri",
+  "index": "XUSIN",
+  "norm": "sanifoam endustri"
+ },
+ {
+  "symbol": "SANKO",
+  "name": "Sanko Pazarlama",
+  "index": "XUTUM",
+  "norm": "sanko pazarlama"
+ },
+ {
+  "symbol": "SARAE",
+  "name": "Sa-Ra Enerji",
+  "index": "XUSIN",
+  "norm": "sa-ra enerji"
+ },
+ {
+  "symbol": "SARKY",
+  "name": "Sarkuysan",
+  "index": "XU100",
+  "norm": "sarkuysan"
+ },
+ {
+  "symbol": "SASA",
+  "name": "Sasa Polyester",
+  "index": "XU030",
+  "norm": "sasa polyester"
+ },
+ {
+  "symbol": "SAYAS",
+  "name": "Say Yenilenebilir Enerji",
+  "index": "XUSIN",
+  "norm": "say yenilenebilir enerji"
+ },
+ {
+  "symbol": "SDTTR",
+  "name": "Sdt Uzay Ve Savunma",
+  "index": "XUTUM",
+  "norm": "sdt uzay ve savunma"
+ },
+ {
+  "symbol": "SEGMN",
+  "name": "Segmen Kardesler Gida",
+  "index": "XUSIN",
+  "norm": "segmen kardesler gida"
+ },
+ {
+  "symbol": "SEGYO",
+  "name": "Seker Gmyo",
+  "index": "XUTUM",
+  "norm": "seker gmyo"
+ },
+ {
+  "symbol": "SEKFK",
+  "name": "Seker Fin. Kir.",
+  "index": "XUTUM",
+  "norm": "seker fin. kir."
+ },
+ {
+  "symbol": "SEKUR",
+  "name": "Sekuro Plastik",
+  "index": "XUSIN",
+  "norm": "sekuro plastik"
+ },
+ {
+  "symbol": "SELEC",
+  "name": "Selcuk Ecza Deposu",
+  "index": "XUTUM",
+  "norm": "selcuk ecza deposu"
+ },
+ {
+  "symbol": "SELVA",
+  "name": "Selva Gida",
+  "index": "XUSIN",
+  "norm": "selva gida"
+ },
+ {
+  "symbol": "SERNT",
+  "name": "Seranit Granit Seramik",
+  "index": "XUSIN",
+  "norm": "seranit granit seramik"
+ },
+ {
+  "symbol": "SEYKM",
+  "name": "Seyitler Kimya",
+  "index": "XUSIN",
+  "norm": "seyitler kimya"
+ },
+ {
+  "symbol": "SILVR",
+  "name": "Silverline Endustri",
+  "index": "XUSIN",
+  "norm": "silverline endustri"
+ },
+ {
+  "symbol": "SISE",
+  "name": "Sise Cam",
+  "index": "XU030",
+  "norm": "sise cam"
+ },
+ {
+  "symbol": "SKBNK",
+  "name": "Sekerbank",
+  "index": "XU100",
+  "norm": "sekerbank"
+ },
+ {
+  "symbol": "SKTAS",
+  "name": "Soktas",
+  "index": "XUSIN",
+  "norm": "soktas"
+ },
+ {
+  "symbol": "SKYLP",
+  "name": "Skyalp Finansal Teknolojiler",
+  "index": "XUTUM",
+  "norm": "skyalp finansal teknolojiler"
+ },
+ {
+  "symbol": "SKYMD",
+  "name": "Seker Yatirim",
+  "index": "XUTUM",
+  "norm": "seker yatirim"
+ },
+ {
+  "symbol": "SMART",
+  "name": "Smartiks Yazilim",
+  "index": "XUTUM",
+  "norm": "smartiks yazilim"
+ },
+ {
+  "symbol": "SMRTG",
+  "name": "Smart Gunes Enerjisi Tek.",
+  "index": "XUTUM",
+  "norm": "smart gunes enerjisi tek."
+ },
+ {
+  "symbol": "SMRVA",
+  "name": "Sumer Varlik Yonetim",
+  "index": "XUTUM",
+  "norm": "sumer varlik yonetim"
+ },
+ {
+  "symbol": "SNGYO",
+  "name": "Sinpas Gmyo",
+  "index": "XUTUM",
+  "norm": "sinpas gmyo"
+ },
+ {
+  "symbol": "SNICA",
+  "name": "Sanica Isi Sanayi",
+  "index": "XUSIN",
+  "norm": "sanica isi sanayi"
+ },
+ {
+  "symbol": "SOHOE",
+  "name": "Soho Giyim Ve Enerji",
+  "index": "XUSIN",
+  "norm": "soho giyim ve enerji"
+ },
+ {
+  "symbol": "SOKE",
+  "name": "Soke Degirmencilik",
+  "index": "XUSIN",
+  "norm": "soke degirmencilik"
+ },
+ {
+  "symbol": "SOKM",
+  "name": "Sok Marketler Ticaret",
+  "index": "XU100",
+  "norm": "sok marketler ticaret"
+ },
+ {
+  "symbol": "SONME",
+  "name": "Sonmez Filament",
+  "index": "XUTUM",
+  "norm": "sonmez filament"
+ },
+ {
+  "symbol": "SRVGY",
+  "name": "Servet Gmyo",
+  "index": "XUTUM",
+  "norm": "servet gmyo"
+ },
+ {
+  "symbol": "SSAAT",
+  "name": "Saat Ve Saat Sanayi",
+  "index": "XUTUM",
+  "norm": "saat ve saat sanayi"
+ },
+ {
+  "symbol": "SUNTK",
+  "name": "Sun Tekstil",
+  "index": "XUSIN",
+  "norm": "sun tekstil"
+ },
+ {
+  "symbol": "SURGY",
+  "name": "Sur Tatil Evleri Gmyo",
+  "index": "XUTUM",
+  "norm": "sur tatil evleri gmyo"
+ },
+ {
+  "symbol": "SUWEN",
+  "name": "Suwen Tekstil",
+  "index": "XUTUM",
+  "norm": "suwen tekstil"
+ },
+ {
+  "symbol": "SVGYO",
+  "name": "Savur Gmyo",
+  "index": "XUTUM",
+  "norm": "savur gmyo"
+ },
+ {
+  "symbol": "TABGD",
+  "name": "Tab Gida",
+  "index": "XUTUM",
+  "norm": "tab gida"
+ },
+ {
+  "symbol": "TARKM",
+  "name": "Tarkim Bitki Koruma",
+  "index": "XUSIN",
+  "norm": "tarkim bitki koruma"
+ },
+ {
+  "symbol": "TATEN",
+  "name": "Tatlipinar Enerji Uretim",
+  "index": "XUTUM",
+  "norm": "tatlipinar enerji uretim"
+ },
+ {
+  "symbol": "TATGD",
+  "name": "Tat Gida",
+  "index": "XUSIN",
+  "norm": "tat gida"
+ },
+ {
+  "symbol": "TAVHL",
+  "name": "Tav Havalimanlari",
+  "index": "XU030",
+  "norm": "tav havalimanlari"
+ },
+ {
+  "symbol": "TBORG",
+  "name": "T.Tuborg",
+  "index": "XUSIN",
+  "norm": "t.tuborg"
+ },
+ {
+  "symbol": "TCELL",
+  "name": "Turkcell",
+  "index": "XU030",
+  "norm": "turkcell"
+ },
+ {
+  "symbol": "TCKRC",
+  "name": "Kirac Galvaniz",
+  "index": "XUSIN",
+  "norm": "kirac galvaniz"
+ },
+ {
+  "symbol": "TDGYO",
+  "name": "Trend Gmyo",
+  "index": "XUTUM",
+  "norm": "trend gmyo"
+ },
+ {
+  "symbol": "TEHOL",
+  "name": "Tera Yatirim Tek. Hol.",
+  "index": "XUTUM",
+  "norm": "tera yatirim tek. hol."
+ },
+ {
+  "symbol": "TEKTU",
+  "name": "Tek-Art Turizm",
+  "index": "XUTUM",
+  "norm": "tek-art turizm"
+ },
+ {
+  "symbol": "TERA",
+  "name": "Tera Yatirim Menkul Degerler",
+  "index": "XUTUM",
+  "norm": "tera yatirim menkul degerler"
+ },
+ {
+  "symbol": "TEZOL",
+  "name": "Europap Tezol Kagit",
+  "index": "XUSIN",
+  "norm": "europap tezol kagit"
+ },
+ {
+  "symbol": "TGSAS",
+  "name": "Tgs Dis Ticaret",
+  "index": "XUTUM",
+  "norm": "tgs dis ticaret"
+ },
+ {
+  "symbol": "THYAO",
+  "name": "Turk Hava Yollari",
+  "index": "XU030",
+  "norm": "turk hava yollari"
+ },
+ {
+  "symbol": "TKFEN",
+  "name": "Tekfen Holding",
+  "index": "XU100",
+  "norm": "tekfen holding"
+ },
+ {
+  "symbol": "TKNSA",
+  "name": "Teknosa Ic Ve Dis Ticaret",
+  "index": "XUTUM",
+  "norm": "teknosa ic ve dis ticaret"
+ },
+ {
+  "symbol": "TLMAN",
+  "name": "Trabzon Liman",
+  "index": "XUTUM",
+  "norm": "trabzon liman"
+ },
+ {
+  "symbol": "TMPOL",
+  "name": "Temapol Polimer Plastik",
+  "index": "XUSIN",
+  "norm": "temapol polimer plastik"
+ },
+ {
+  "symbol": "TMSN",
+  "name": "Tumosan Motor Ve Traktor",
+  "index": "XUSIN",
+  "norm": "tumosan motor ve traktor"
+ },
+ {
+  "symbol": "TNZTP",
+  "name": "Tapdi Tinaztepe",
+  "index": "XUTUM",
+  "norm": "tapdi tinaztepe"
+ },
+ {
+  "symbol": "TOASO",
+  "name": "Tofas Oto. Fab.",
+  "index": "XU030",
+  "norm": "tofas oto. fab."
+ },
+ {
+  "symbol": "TRALT",
+  "name": "Turk Altin Isletmeleri",
+  "index": "XU030",
+  "norm": "turk altin isletmeleri"
+ },
+ {
+  "symbol": "TRCAS",
+  "name": "Turcas Holding",
+  "index": "XUTUM",
+  "norm": "turcas holding"
+ },
+ {
+  "symbol": "TRENJ",
+  "name": "Tr Dogal Enerji",
+  "index": "XU100",
+  "norm": "tr dogal enerji"
+ },
+ {
+  "symbol": "TRGYO",
+  "name": "Torunlar Gmyo",
+  "index": "XUTUM",
+  "norm": "torunlar gmyo"
+ },
+ {
+  "symbol": "TRHOL",
+  "name": "Tera Finansal Yat. Hol.",
+  "index": "XUTUM",
+  "norm": "tera finansal yat. hol."
+ },
+ {
+  "symbol": "TRMET",
+  "name": "Tr Anadolu Metal Madencilik",
+  "index": "XU050",
+  "norm": "tr anadolu metal madencilik"
+ },
+ {
+  "symbol": "TSGYO",
+  "name": "Tskb Gmyo",
+  "index": "XUTUM",
+  "norm": "tskb gmyo"
+ },
+ {
+  "symbol": "TSKB",
+  "name": "T.S.K.B.",
+  "index": "XU100",
+  "norm": "t.s.k.b."
+ },
+ {
+  "symbol": "TSPOR",
+  "name": "Trabzonspor Sportif",
+  "index": "XUTUM",
+  "norm": "trabzonspor sportif"
+ },
+ {
+  "symbol": "TTKOM",
+  "name": "Turk Telekom",
+  "index": "XU030",
+  "norm": "turk telekom"
+ },
+ {
+  "symbol": "TTRAK",
+  "name": "Turk Traktor",
+  "index": "XUSIN",
+  "norm": "turk traktor"
+ },
+ {
+  "symbol": "TUCLK",
+  "name": "Tugcelik",
+  "index": "XUSIN",
+  "norm": "tugcelik"
+ },
+ {
+  "symbol": "TUKAS",
+  "name": "Tukas",
+  "index": "XU100",
+  "norm": "tukas"
+ },
+ {
+  "symbol": "TUPRS",
+  "name": "Tupras",
+  "index": "XU030",
+  "norm": "tupras"
+ },
+ {
+  "symbol": "TUREX",
+  "name": "Tureks Turizm Tasimacilik",
+  "index": "XUTUM",
+  "norm": "tureks turizm tasimacilik"
+ },
+ {
+  "symbol": "TURGG",
+  "name": "Turker Proje Gayrimenkul",
+  "index": "XUTUM",
+  "norm": "turker proje gayrimenkul"
+ },
+ {
+  "symbol": "TURSG",
+  "name": "Turkiye Sigorta",
+  "index": "XU050",
+  "norm": "turkiye sigorta"
+ },
+ {
+  "symbol": "UCAYM",
+  "name": "Ucay Muhendislik",
+  "index": "XUTUM",
+  "norm": "ucay muhendislik"
+ },
+ {
+  "symbol": "UFUK",
+  "name": "Ufuk Yatirim",
+  "index": "XUTUM",
+  "norm": "ufuk yatirim"
+ },
+ {
+  "symbol": "ULAS",
+  "name": "Ulaslar Turizm Yat.",
+  "index": "XUTUM",
+  "norm": "ulaslar turizm yat."
+ },
+ {
+  "symbol": "ULKER",
+  "name": "Ulker Biskuvi",
+  "index": "XU050",
+  "norm": "ulker biskuvi"
+ },
+ {
+  "symbol": "ULUFA",
+  "name": "Ulusal Faktoring",
+  "index": "XUTUM",
+  "norm": "ulusal faktoring"
+ },
+ {
+  "symbol": "ULUSE",
+  "name": "Ulusoy Elektrik",
+  "index": "XUSIN",
+  "norm": "ulusoy elektrik"
+ },
+ {
+  "symbol": "ULUUN",
+  "name": "Ulusoy Un Sanayi",
+  "index": "XUSIN",
+  "norm": "ulusoy un sanayi"
+ },
+ {
+  "symbol": "UNLU",
+  "name": "Unlu Yatirim Holding",
+  "index": "XUTUM",
+  "norm": "unlu yatirim holding"
+ },
+ {
+  "symbol": "USAK",
+  "name": "Usak Seramik",
+  "index": "XUSIN",
+  "norm": "usak seramik"
+ },
+ {
+  "symbol": "VAKBN",
+  "name": "Vakiflar Bankasi",
+  "index": "XU030",
+  "norm": "vakiflar bankasi"
+ },
+ {
+  "symbol": "VAKFA",
+  "name": "Vakif Faktoring",
+  "index": "XUTUM",
+  "norm": "vakif faktoring"
+ },
+ {
+  "symbol": "VAKFN",
+  "name": "Vakif Fin. Kir.",
+  "index": "XUTUM",
+  "norm": "vakif fin. kir."
+ },
+ {
+  "symbol": "VAKKO",
+  "name": "Vakko Tekstil",
+  "index": "XUTUM",
+  "norm": "vakko tekstil"
+ },
+ {
+  "symbol": "VANGD",
+  "name": "Vanet Gida",
+  "index": "XUSIN",
+  "norm": "vanet gida"
+ },
+ {
+  "symbol": "VBTYZ",
+  "name": "Vbt Yazilim",
+  "index": "XUTUM",
+  "norm": "vbt yazilim"
+ },
+ {
+  "symbol": "VERTU",
+  "name": "Verusaturk Girisim",
+  "index": "XUTUM",
+  "norm": "verusaturk girisim"
+ },
+ {
+  "symbol": "VERUS",
+  "name": "Verusa Holding",
+  "index": "XUTUM",
+  "norm": "verusa holding"
+ },
+ {
+  "symbol": "VESBE",
+  "name": "Vestel Beyaz Esya",
+  "index": "XUSIN",
+  "norm": "vestel beyaz esya"
+ },
+ {
+  "symbol": "VESTL",
+  "name": "Vestel",
+  "index": "XU100",
+  "norm": "vestel"
+ },
+ {
+  "symbol": "VKFYO",
+  "name": "Vakif Yat. Ort.",
+  "index": "XYORT",
+  "norm": "vakif yat. ort."
+ },
+ {
+  "symbol": "VKGYO",
+  "name": "Vakif Gmyo",
+  "index": "XUTUM",
+  "norm": "vakif gmyo"
+ },
+ {
+  "symbol": "VKING",
+  "name": "Viking Kagit",
+  "index": "XUSIN",
+  "norm": "viking kagit"
+ },
+ {
+  "symbol": "VRGYO",
+  "name": "Vera Konsept Gmyo",
+  "index": "XUTUM",
+  "norm": "vera konsept gmyo"
+ },
+ {
+  "symbol": "VSNMD",
+  "name": "Visne Madencilik",
+  "index": "XUSIN",
+  "norm": "visne madencilik"
+ },
+ {
+  "symbol": "YAPRK",
+  "name": "Yaprak Sut Ve Besi Cift.",
+  "index": "XUSIN",
+  "norm": "yaprak sut ve besi cift."
+ },
+ {
+  "symbol": "YATAS",
+  "name": "Yatas",
+  "index": "XUSIN",
+  "norm": "yatas"
+ },
+ {
+  "symbol": "YAYLA",
+  "name": "Yayla En. Ur. Tur. Ve Ins",
+  "index": "XUTUM",
+  "norm": "yayla en. ur. tur. ve ins"
+ },
+ {
+  "symbol": "YEOTK",
+  "name": "Yeo Teknoloji Enerji",
+  "index": "XUTUM",
+  "norm": "yeo teknoloji enerji"
+ },
+ {
+  "symbol": "YESIL",
+  "name": "Yesil Yatirim Holding",
+  "index": "XUTUM",
+  "norm": "yesil yatirim holding"
+ },
+ {
+  "symbol": "YGGYO",
+  "name": "Yeni Gimat Gmyo",
+  "index": "XUTUM",
+  "norm": "yeni gimat gmyo"
+ },
+ {
+  "symbol": "YIGIT",
+  "name": "Yigit Aku",
+  "index": "XUSIN",
+  "norm": "yigit aku"
+ },
+ {
+  "symbol": "YKBNK",
+  "name": "Yapi Ve Kredi Bank.",
+  "index": "XU030",
+  "norm": "yapi ve kredi bank."
+ },
+ {
+  "symbol": "YKSLN",
+  "name": "Yukselen Celik",
+  "index": "XUSIN",
+  "norm": "yukselen celik"
+ },
+ {
+  "symbol": "YUNSA",
+  "name": "Yunsa",
+  "index": "XUSIN",
+  "norm": "yunsa"
+ },
+ {
+  "symbol": "YYLGD",
+  "name": "Yayla Gida",
+  "index": "XUSIN",
+  "norm": "yayla gida"
+ },
+ {
+  "symbol": "ZEDUR",
+  "name": "Zedur Enerji",
+  "index": "XUTUM",
+  "norm": "zedur enerji"
+ },
+ {
+  "symbol": "ZERGY",
+  "name": "Zeray Gmyo",
+  "index": "XUTUM",
+  "norm": "zeray gmyo"
+ },
+ {
+  "symbol": "ZGYO",
+  "name": "Z Gmyo",
+  "index": "XUTUM",
+  "norm": "z gmyo"
+ },
+ {
+  "symbol": "ZOREN",
+  "name": "Zorlu Enerji",
+  "index": "XU100",
+  "norm": "zorlu enerji"
+ },
+ {
+  "symbol": "ZRGYO",
+  "name": "Ziraat Gmyo",
+  "index": "XUTUM",
+  "norm": "ziraat gmyo"
+ }
+]
