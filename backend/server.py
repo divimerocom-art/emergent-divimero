@@ -185,6 +185,14 @@ async def logout(response: Response):
     response.delete_cookie("access_token", path="/")
     return {"ok": True}
 
+@api.post("/auth/refresh")
+async def refresh(user=Depends(get_current_user), response: Response = None):
+    """Rotate the JWT (keeps the same identity). Requires a currently-valid token."""
+    token = make_token(user["id"])
+    if response is not None:
+        response.set_cookie("access_token", token, max_age=ACCESS_TTL_MIN * 60, httponly=True, samesite="none", secure=True, path="/")
+    return {"token": token, "user": public_user(user)}
+
 @api.get("/auth/me")
 async def me(user=Depends(get_current_user)):
     return public_user(user)
@@ -662,6 +670,26 @@ async def upload_media(file: UploadFile = File(...), user=Depends(get_current_us
     }
     await db.files.insert_one(record)
     return {"id": record["id"], "url": f"/api/media/{record['id']}", "content_type": ctype, "kind": record["kind"]}
+
+@api.head("/media/{file_id}")
+async def head_media(file_id: str):
+    """HEAD support: many browsers/video preloaders check headers before ranged GET."""
+    rec = await db.files.find_one({"id": file_id, "is_deleted": False})
+    if not rec:
+        raise HTTPException(404, "Dosya bulunamadı")
+    try:
+        data, ct = await run_in_threadpool(get_object, rec["storage_path"])
+    except Exception:
+        raise HTTPException(502, "Depolama erişimi başarısız")
+    media_type = rec.get("content_type") or ct or "application/octet-stream"
+    total = len(data)
+    return FastResponse(status_code=200, media_type=media_type, headers={
+        "ETag": f'W/"{file_id}-{total}"',
+        "Cache-Control": "public, max-age=86400",
+        "Accept-Ranges": "bytes",
+        "Content-Length": str(total),
+    })
+
 
 @api.get("/media/{file_id}")
 async def get_media(file_id: str, request: Request):

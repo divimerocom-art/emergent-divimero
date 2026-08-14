@@ -46,13 +46,23 @@ export default function FeedCard({ post, onChange }) {
 
       {post.image_url && (
         <div className="mt-3 overflow-hidden rounded-xl border border-line">
-          <img src={post.image_url} alt="" className="w-full max-h-96 object-cover" />
+          <img
+            src={post.image_url} alt=""
+            className="w-full max-h-96 object-cover"
+            data-testid={`image-${post.id}`}
+            onError={(e) => { e.currentTarget.parentElement.style.display = "none"; }}
+          />
         </div>
       )}
 
       {post.video_url && (
         <div className="mt-3 overflow-hidden rounded-xl border border-line bg-black">
-          <video src={post.video_url} controls playsInline preload="metadata" className="w-full max-h-96" data-testid={`video-${post.id}`}/>
+          <video
+            src={post.video_url} controls playsInline preload="metadata"
+            className="w-full max-h-96"
+            data-testid={`video-${post.id}`}
+            onError={(e) => { e.currentTarget.parentElement.style.display = "none"; }}
+          />
         </div>
       )}
 
