@@ -16,6 +16,7 @@ import time
 import logging
 import threading
 import unicodedata
+from concurrent.futures import ThreadPoolExecutor
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, asdict
 from datetime import datetime, timezone
@@ -375,32 +376,52 @@ class YahooBistProvider(MarketDataProvider):
         sym = clean_symbol(symbol)
         if sym not in _UNIVERSE:
             return None
-        now = time.time()
-        with self._lock:
-            hit = self._cache.get(sym)
-            if hit and now - hit[0] < self.TTL_SECONDS:
-                return hit[1]
-            recent_fail = self._failures.get(sym, 0)
-        if now - recent_fail < self.FAILURE_COOLDOWN:
-            with self._lock:
-                if hit: return hit[1]
-            return self._demo.get_quote(sym)
-        q = self._fetch_from_yahoo(sym)
-        with self._lock:
-            if q is not None:
-                self._cache[sym] = (now, q)
-                self._failures.pop(sym, None)
-                return q
-            self._failures[sym] = now
-        return (hit[1] if hit else self._demo.get_quote(sym))
+        # Single-symbol path is just a batch of one — reuse the parallel batch
+        # so cache/failure logic never diverges between the two entry points.
+        got = self.get_quotes([sym])
+        return got.get(sym)
 
     def get_quotes(self, symbols: List[str]) -> Dict[str, Quote]:
-        out = {}
-        for s in symbols:
-            q = self.get_quote(s)
-            if q is not None:
-                out[clean_symbol(s)] = q
-        return out
+        """Parallel Yahoo fetch across symbols with cache + failure cooldown."""
+        cleaned = list({clean_symbol(s) for s in symbols if clean_symbol(s) in _UNIVERSE})
+        if not cleaned:
+            return {}
+        now = time.time()
+        result: Dict[str, Quote] = {}
+        to_fetch: List[str] = []
+        with self._lock:
+            for s in cleaned:
+                hit = self._cache.get(s)
+                if hit and now - hit[0] < self.TTL_SECONDS:
+                    result[s] = hit[1]
+                elif now - self._failures.get(s, 0) < self.FAILURE_COOLDOWN:
+                    if hit:
+                        result[s] = hit[1]
+                    else:
+                        d = self._demo.get_quote(s)
+                        if d is not None:
+                            result[s] = d
+                else:
+                    to_fetch.append(s)
+        if to_fetch:
+            with ThreadPoolExecutor(max_workers=min(8, len(to_fetch))) as ex:
+                fetched = list(ex.map(self._fetch_from_yahoo, to_fetch))
+            with self._lock:
+                for sym, q in zip(to_fetch, fetched):
+                    if q is not None:
+                        self._cache[sym] = (now, q)
+                        self._failures.pop(sym, None)
+                        result[sym] = q
+                    else:
+                        self._failures[sym] = now
+                        stale = self._cache.get(sym)
+                        if stale:
+                            result[sym] = stale[1]
+                        else:
+                            d = self._demo.get_quote(sym)
+                            if d is not None:
+                                result[sym] = d
+        return result
 
     def search(self, query: str, limit: int = 25) -> List[TickerInfo]:
         return search_catalog(query, limit)

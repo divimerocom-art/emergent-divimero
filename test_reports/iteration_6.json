@@ -1,0 +1,86 @@
+{
+  "summary": "Iteration 6 backend-only perf + correctness review. All four stated perf budgets PASS on the happy path (search q=T cold 1.996s / warm 0.025s; feed 0.024-0.027s; portfolio 0.029-0.045s; prewarm 35 symbols confirmed in backend.err.log; all 6 smoke endpoints 200 for Deniz). HOWEVER two serious defects were found that the review request assumed were already done: (1) the batched /api/feed now returns WRONG allocation_pct and WRONG change_status because the batch tx query drops cash/deposit transactions — ASTOR reports 24.11% in /feed vs 8.05% on /api/posts/{id}, and THYAO's badge flips from 'reduced' to 'increased'; (2) the claimed ThreadPoolExecutor parallelisation of YahooBistProvider.get_quotes was NEVER applied — it is still a sequential for-loop and ThreadPoolExecutor is an unused import. Worse, /api/market/search|tickers call get_quotes synchronously on the event loop, so a single cold search stalls the whole server (proved: /api/feed took 5.305s while a cold /market/tickers?q=K&limit=120 was in flight vs 0.027s idle). Regression suite: 123 passed / 2 failed (1 pre-existing intentional DELETE /api/posts marker, 1 new feed-divergence test I added).",
+  "backend_issues": {
+    "critical": [
+      {
+        "endpoint": "GET /api/feed",
+        "issue": "CORRECTNESS REGRESSION from the batching rewrite. server.py:567 loads author transactions with filter {\"user_id\": {\"$in\": ...}, \"ticker\": {\"$ne\": None}}. In Mongo, {ticker: {$ne: null}} excludes null AND missing fields, so every cash/deposit transaction is dropped. allocation_for_symbol() then computes total portfolio value WITHOUT cash, inflating allocation_pct. Measured on seeded data: ASTOR /feed=24.109% vs /api/posts/{id}=8.0532% (correct); THYAO /feed=5.5266% vs 1.8461%. Deniz has a 200,000 TRY deposit (1 of 12 txs) that is silently discarded. Knock-on: _change_status() flips the user-visible badge — the THYAO post shows 'increased' (Arttirdi) in the feed but 'reduced' (Azaltti) on the post detail page. Fix: drop the ticker filter (fetch ALL txs for those authors, exactly like _user_txs) and let compute_state handle cash.",
+        "priority": "CRITICAL"
+      },
+      {
+        "endpoint": "market_data.py YahooBistProvider.get_quotes (lines 398-404)",
+        "issue": "The stated primary optimisation is NOT in the code. get_quotes is still `for s in symbols: self.get_quote(s)` — fully sequential, one blocking requests.get (timeout=8) per uncached symbol. `from concurrent.futures import ThreadPoolExecutor` at line 19 is an unused import. Measured cold sequential cost: q=A&limit=50 -> 4.06s; q=K&limit=120 -> 5.70s; q=T&limit=25 -> 1.996s (only fast because 35 popular symbols were prewarmed). Since the catalog is 587 symbols, most real searches fall outside the prewarm set. Implement the ThreadPoolExecutor(max_workers=8) map that was described.",
+        "priority": "HIGH"
+      },
+      {
+        "endpoint": "GET /api/market/search, GET /api/market/tickers, GET /api/market/movers, GET /api/portfolio/performance",
+        "issue": "EVENT LOOP BLOCKING — these async handlers call provider.get_quotes(...) directly (server.py:328, 376, 315, 247, 409, 464, 814) instead of via run_in_threadpool. Only /api/feed:576 was converted. get_quotes does blocking network I/O, so one cold market call freezes the entire FastAPI worker for every concurrent user. PROVEN: an idle /api/feed responds in 0.027s, but measured 5.305s when issued 0.4s after a cold /api/market/tickers?with_price=true&limit=120&q=K. This is very likely the residual cause of the user's original 'hisseler gec yukleniyor' complaint under concurrency, and it is not fixed by prewarming.",
+        "priority": "HIGH"
+      }
+    ],
+    "minor": [
+      {
+        "endpoint": "GET /api/feed",
+        "issue": "author_txs is built from an unsorted cursor (server.py:567-570) while _user_txs sorts by date ascending. compute_state uses FIFO cost basis, which is order-dependent, so feed cost-basis/allocation can differ from every other endpoint even after the cash bug is fixed. Add .sort(\"date\", 1)."
+      },
+      {
+        "endpoint": "GET /api/feed",
+        "issue": "Rounding inconsistency: feed returns the raw float (allocation_pct=24.10929680802281) whereas _current_allocation returns round(alloc, 4) (8.0532). Round in the feed path too so the UI does not render 14 decimals."
+      },
+      {
+        "endpoint": "GET /api/feed",
+        "issue": "Behaviour change: when an author has zero transactions the feed sets current_position=None and change_status=None, while the old _hydrate_post produced allocation 0.0 -> change_status 'closed'. The 'closed' badge is now unreachable via the feed."
+      },
+      {
+        "endpoint": "GET /api/portfolio/performance",
+        "issue": "Calls provider.get_quotes once per transaction inside a loop (server.py:311-315) — O(N_tx) sequential provider calls. Currently 0.066-0.082s only because every symbol is cache-warm; it will be pathological for a portfolio holding non-prewarmed symbols. Hoist a single get_quotes call outside the loop."
+      },
+      {
+        "endpoint": "DELETE /api/posts/{post_id}",
+        "issue": "PRE-EXISTING (not this iteration): still 405. tests/test_iteration5.py::TestBrokenMediaPost::test_delete_post_endpoint_missing is the intentional marker test and remains the only carried-over failure."
+      }
+    ]
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [
+      {
+        "flow": "Feed disclosure badge",
+        "issue": "Because /api/feed returns inflated allocation_pct and an inverted change_status, PositionDisclosureCard will render the wrong direction label (Arttirdi instead of Azaltti) and an impossible allocation vs the profile/post-detail pages. Frontend was not tested this iteration (backend-only request), but this is a guaranteed user-visible wrong number.",
+        "affected_selectors": ["PositionDisclosureCard"]
+      }
+    ],
+    "design_issues": []
+  },
+  "test_report_links": [
+    "/app/backend/tests/test_iteration6_perf.py",
+    "/app/backend/tests/test_iteration6_rca.py",
+    "/app/test_reports/pytest/pytest_results.xml"
+  ],
+  "action_items": [
+    "CRITICAL: /api/feed (server.py:567) — remove the {\"ticker\": {\"$ne\": None}} filter so cash/deposit txs are included; then re-verify /api/feed allocation_pct and change_status equal /api/posts/{id} exactly (tests/test_iteration6_perf.py::TestFeed::test_feed_matches_single_post_endpoint must go green).",
+    "HIGH: Actually implement the ThreadPoolExecutor(max_workers=8) fan-out in YahooBistProvider.get_quotes (market_data.py:398) — it is still a sequential loop and the import is unused.",
+    "HIGH: Wrap every remaining provider.get_quotes / get_quote call in async handlers with run_in_threadpool (server.py lines 247, 315, 328, 376, 409, 464, 814) — a cold market call currently blocks the whole event loop for 5+ seconds.",
+    "Add .sort(\"date\", 1) to the feed transaction cursor (FIFO is order-dependent).",
+    "Round feed allocation_pct to 4 decimals to match _current_allocation.",
+    "Hoist the get_quotes call out of the /api/portfolio/performance per-transaction loop."
+  ],
+  "critical_code_review_comments": [
+    "Mongo gotcha: {field: {$ne: null}} also excludes documents where the field is absent — this is exactly how the deposit rows vanished from the /feed calculation. Prefer no filter at all when the downstream calculator needs the full ledger.",
+    "The batched /feed duplicates the disclosure/change_status logic already in _hydrate_post instead of sharing it, which is why the two paths silently diverged. Extract a single pure helper that both call, taking (txs, quotes) as inputs — that makes divergence structurally impossible.",
+    "Prewarming only _DEMO_PRICES (35 symbols) while the searchable catalog is 587 symbols means the fix hides the latency for demo tickers and leaves it for real ones. Prewarm is a mitigation, not the fix; the parallel fetch is the fix.",
+    "server.py is 984 lines — past the 700-line guideline. Split market, feed/social, portfolio, and media routers into modules.",
+    "Any async def handler doing requests.get (even indirectly) must go through run_in_threadpool; only 1 of 7 get_quotes call sites was converted, so the perf work is roughly 15% complete."
+  ],
+  "updated_files": [
+    "/app/backend/tests/test_iteration6_perf.py",
+    "/app/backend/tests/test_iteration6_rca.py"
+  ],
+  "success_rate": {"backend": "88% (123/125 pytest; but 3 of 7 reviewed perf/correctness claims are not actually implemented)", "frontend": "not tested (backend-only request)"},
+  "seed_data_creation": "None — existing seed data used as instructed (no re-seed).",
+  "should_call_test_agent_after_fix": true,
+  "should_main_agent_self_test": false,
+  "test_credentials": "Deniz: deniz@divimero.com / demo1234 (login returns {token, user} — note the key is 'token', NOT 'access_token')",
+  "context_for_next_testing_agent": "New files: tests/test_iteration6_perf.py (perf budgets + feed correctness + feed-vs-post-detail parity + prewarm log check) and tests/test_iteration6_rca.py (2 intentionally-failing RCA probes documenting the cash-filter bug and the event-loop blocking). Run with `python -m pytest tests/ -n0 -p no:randomly` (pytest.ini forces -n --dist loadscope; passing a single file needs -n0). Expected once fixed: everything green except the known DELETE /api/posts/{id} marker in test_iteration5.py. Timing baselines recorded: search q=T&limit=25 cold 1.996s / warm 0.025s; search q=A&limit=50 cold 4.06s; search q=K&limit=120 cold 5.70s; feed 0.024-0.027s; portfolio 0.029-0.045s (6 holdings, total_value 300314.0); portfolio/performance 0.066s. Correct reference allocations from /api/posts/{id}: ASTOR 8.0532%, THYAO 1.8461% (status 'reduced'). Deniz has 12 txs, 11 with a ticker and one 200000 TRY deposit.",
+  "rca_of_the_issue": "DEFECT 1 (feed allocations): server.py:567 fetches author transactions with `{\"user_id\": {\"$in\": authors_with_disclosure}, \"ticker\": {\"$ne\": None}}`. The developer added the ticker filter as an optimisation to only pull rows that contribute a symbol, but portfolio_calc.compute_state()/valuation() need the FULL ledger because total_value = cash + securities. Mongo's $ne:null also excludes missing fields, so Deniz's 200,000 TRY deposit row was dropped, cash became 0, total_value fell from ~300,314 to ~100,300, and every allocation_pct was scaled up by ~2.99x. _change_status() then compares the inflated current value against the stored underlying_allocation_pct and flips 'reduced' to 'increased'. Reproduce: GET /api/feed and GET /api/posts/{same_id} and diff current_position / disclosure.change_status (tests/test_iteration6_perf.py::TestFeed::test_feed_matches_single_post_endpoint). Fix: remove the ticker filter; optionally keep a per-author symbol set derived after loading. DEFECT 2 (residual slowness): YahooBistProvider.get_quotes is still sequential and, except for /api/feed, every caller invokes it directly inside an async handler, so the blocking requests.get loop runs on the event loop. Reproduce: start a cold GET /api/market/tickers?with_price=true&limit=120&q=K in one thread and 0.4s later GET /api/feed — the feed latency jumps from 0.027s to 5.305s (tests/test_iteration6_rca.py::test_rca_cold_market_call_blocks_event_loop). Mitigation: ThreadPoolExecutor fan-out inside get_quotes plus run_in_threadpool at all seven call sites."
+}

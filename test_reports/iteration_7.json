@@ -1,0 +1,64 @@
+{
+  "summary": "Iteration 7 backend-only re-verification of the two iteration-6 defects. BOTH ARE FIXED AND INDEPENDENTLY CONFIRMED. (1) YahooBistProvider.get_quotes now really fans out via ThreadPoolExecutor(max_workers=min(8,n)) with per-symbol cache + failure-cooldown, and get_quote delegates to it; measured /api/market/search?q=K&with_price=true&limit=30 cold 1.554s, warm 0.184s / 0.065s (budget: cold<5s, warm<200ms - PASS). (2) /api/feed no longer filters transactions on ticker, so cash/deposit rows are included: /api/feed ASTOR allocation_pct = 8.0532 which exactly equals both /api/posts/{id} and an independent full-ledger recomputation from Mongo (the old buggy ticker-only computation yields 24.109 - proven side-by-side in test_iteration6_rca.py). change_status now matches between /api/feed and /api/posts/{id} for all 4 seeded disclosure posts. Event loop no longer stalls: a cold /api/market/tickers?q=K&limit=120&with_price=true (3.3-6.9s) runs concurrently with /api/feed at 0.072-0.119s (was 5.305s in iter 6). Perf: feed 0.029-0.085s, portfolio 0.028-0.078s, all 6 Deniz smoke endpoints 200. Regression suite: 140 passed / 2 failed - the only remaining failures are the pre-existing intentional DELETE /api/posts marker and a ROUNDING-ONLY divergence (feed returns 8.053237611300172 while /api/posts/{id} returns 8.0532).",
+  "backend_issues": {
+    "critical": [],
+    "minor": [
+      {
+        "endpoint": "GET /api/feed",
+        "issue": "UNFIXED from iteration 6 (minor): allocation_pct is returned as a raw float (8.053237611300172 / 1.8460677823877676) whereas /api/posts/{id} returns round(alloc,4) (8.0532 / 1.8461). Numerically identical but the payloads differ, so tests/test_iteration6_perf.py::TestFeed::test_feed_matches_single_post_endpoint still fails on strict equality and the UI can render 14 decimals. Fix: round(cur_alloc, 4) in the /api/feed hydration (server.py ~line 590)."
+      },
+      {
+        "endpoint": "GET /api/feed",
+        "issue": "UNFIXED from iteration 6: the batched author-transaction cursor (server.py:570) has no .sort(\"date\", 1) while _user_txs does. compute_state uses FIFO cost basis which is order-dependent, so feed values can silently diverge from every other endpoint whenever Mongo returns a different natural order. Add .sort(\"date\", 1)."
+      },
+      {
+        "endpoint": "GET /api/market/quote/{symbol}, /api/market/movers, /api/portfolio/performance, POST /api/posts (snapshot), /api/portfolio",
+        "issue": "UNFIXED from iteration 6: only /api/market/tickers and /api/feed were converted to run_in_threadpool. server.py lines 248, 316, 352, 377, 410, 465, 819 still call provider.get_quote(s) directly inside async handlers, i.e. blocking requests.get on the event loop. Not currently observable (0.07-0.29s) because those paths touch prewarmed/cached symbols only, but it is latent: any of them hitting a cold non-prewarmed symbol set will freeze the whole worker again."
+      },
+      {
+        "endpoint": "GET /api/market/tickers?q=K&limit=120&with_price=true",
+        "issue": "Cold fan-out of 120 uncached symbols measured 3.34s / 5.43s / 6.86s across runs - max_workers is capped at 8, so ~15 sequential rounds of an 8s-timeout HTTP call. Acceptable per the review brief (warm calls are fast, and it no longer blocks others), but consider max_workers=min(16, n) or capping with_price to the visible page size."
+      },
+      {
+        "endpoint": "GET /api/portfolio/performance",
+        "issue": "UNFIXED from iteration 6: still calls get_quotes once per transaction inside the loop (server.py:312-316). Fast today (0.064s) only because everything is cache-warm. Hoist one get_quotes outside the loop."
+      },
+      {
+        "endpoint": "POST /api/auth/login",
+        "issue": "Playbook check: NO brute-force lockout. 6 consecutive wrong-password attempts on deniz@divimero.com all return 401 and the 7th correct login succeeds (no 423/429). bcrypt hashes are correct ($2b$12$ for all 7 users) and httpOnly cookies are set (httponly=True, samesite=none, secure=True). However CORSMiddleware uses allow_origins=[\"*\"] with allow_credentials=False (server.py:943-944), so the cookie-based auth path cannot work cross-origin in a browser - only the Bearer/localStorage path does. There is no seed_admin routine (seed_demo.py instead), so the 'update existing admin on password change' playbook item is N/A."
+      }
+    ]
+  },
+  "frontend_issues": {"ui_bugs": [], "integration_issues": [], "design_issues": []},
+  "test_report_links": [
+    "/app/backend/tests/test_iteration7_perf.py",
+    "/app/backend/tests/test_iteration7_blocking.py",
+    "/app/backend/tests/test_iteration6_rca.py",
+    "/app/test_reports/pytest/pytest_results.xml"
+  ],
+  "action_items": [
+    "MINOR: round /api/feed allocation_pct to 4 decimals so it byte-matches /api/posts/{id} (last remaining failure of test_iteration6_perf.py::TestFeed::test_feed_matches_single_post_endpoint).",
+    "MINOR: add .sort(\"date\", 1) to the /api/feed author-transaction cursor (server.py:570) - FIFO is order-dependent.",
+    "MINOR/LATENT: wrap the 7 remaining provider.get_quote(s) call sites in run_in_threadpool (server.py 248, 316, 352, 377, 410, 465, 819).",
+    "MINOR: hoist the get_quotes call out of the /api/portfolio/performance per-transaction loop.",
+    "OPTIONAL: raise ThreadPoolExecutor max_workers above 8 for large with_price batches (120 symbols cold = 3.3-6.9s)."
+  ],
+  "critical_code_review_comments": [
+    "The feed and /api/posts/{id} still duplicate the disclosure/current_position hydration logic; the rounding mismatch is exactly the kind of drift this causes. Extract one pure helper taking (txs, quotes, disclosure) and call it from both paths.",
+    "server.py is 989 lines - past the 700-line guideline. Split market / feed-social / portfolio / media into routers.",
+    "get_quotes writes cache entries with the `now` captured BEFORE the parallel fetch (market_data.py:389 vs 412). For a slow batch the TTL is effectively shortened by the fetch duration - harmless but worth using a post-fetch timestamp.",
+    "CORS allow_origins=['*'] + allow_credentials=False contradicts setting httpOnly auth cookies; either pin explicit origins and enable credentials, or drop the cookies to avoid a misleading second auth path."
+  ],
+  "updated_files": [
+    "/app/backend/tests/test_iteration7_perf.py",
+    "/app/backend/tests/test_iteration7_blocking.py",
+    "/app/backend/tests/test_iteration6_rca.py"
+  ],
+  "success_rate": {"backend": "99% (140/142 pytest; 1 pre-existing marker + 1 rounding-only mismatch)", "frontend": "not tested (backend-only request)"},
+  "seed_data_creation": "None - existing seed data reused. No test data created or deleted.",
+  "should_call_test_agent_after_fix": false,
+  "should_main_agent_self_test": true,
+  "test_credentials": "Deniz: deniz@divimero.com / demo1234 (login response key is 'token', not 'access_token')",
+  "context_for_next_testing_agent": "Iteration 6's two blockers are CONFIRMED FIXED. test_iteration6_rca.py was rewritten from intentionally-failing documentation markers into positive regression assertions (its old ASTOR reference calc was itself wrong because it built the quote map from /market/tickers?limit=200, which omitted some of Deniz's holdings -> 10.93% instead of 8.0532%; it now fetches quotes per holding symbol). New files: test_iteration7_perf.py (12 tests: cold/warm search, feed, portfolio budgets, feed-vs-post parity across all disclosure posts, THYAO='reduced', concurrency, 6 smoke endpoints) and test_iteration7_blocking.py (3 probes for the non-threadpooled call sites - all pass today because symbols are cache-warm). Run with `python -m pytest tests/ -p no:randomly`; single files need -n0. Timings this round: search q=K&limit=30 cold 1.554s / warm 0.065-0.184s; feed 0.029-0.085s; portfolio 0.028-0.078s; portfolio/performance 0.064s; cold tickers q=K&limit=120 3.3-6.9s (non-blocking); prewarm log 'Market cache pre-warmed: 35 symbols'. Reference allocations: ASTOR 8.0532%, THYAO 1.8461% ('reduced' on both seeded posts). ASTOR posts show 'increased' (disclosed 4.2) and 'reduced' (disclosed 8.4) and match post-detail. Only remaining failures: test_iteration5.py::TestBrokenMediaPost::test_delete_post_endpoint_missing (DELETE /api/posts/{id} still 405, pre-existing) and test_iteration6_perf.py::TestFeed::test_feed_matches_single_post_endpoint (rounding only).",
+  "rca_of_the_issue": "Verified fix 1: market_data.py:384-424 get_quotes partitions cleaned symbols into cache-hits / cooldown-fallbacks / to_fetch under a lock, then ex.map(self._fetch_from_yahoo, to_fetch) with max_workers=min(8,n), writing cache/failure state afterwards; get_quote(sym) is now get_quotes([sym]).get(sym), so the two entry points cannot diverge. Verified fix 2: server.py:568-570 fetches ALL transactions for authors with disclosures (ticker filter removed), so cash/deposit rows are back in compute_state -> total_value 300,314 instead of ~100,300. Independent proof in test_iteration6_rca.py: full-ledger ASTOR = 8.0532%, ticker-only = 24.1093%, and /api/feed returns 8.0532%. Residual: the feed path returns the unrounded float and lacks the date sort, and 7 of 9 get_quotes call sites are still executed on the event loop (latent stall risk for non-prewarmed symbols)."
+}

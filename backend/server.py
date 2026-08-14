@@ -15,7 +15,7 @@ import asyncio
 import bcrypt
 import jwt
 from datetime import datetime, timezone, timedelta
-from typing import List, Optional, Literal
+from typing import List, Optional, Literal, Dict
 
 from fastapi import FastAPI, APIRouter, HTTPException, Depends, Request, Response, status, UploadFile, File, Query, Header
 from fastapi.middleware.cors import CORSMiddleware
@@ -26,6 +26,7 @@ from pydantic import BaseModel, EmailStr, Field, ConfigDict
 
 from market_data import get_market_data_provider, search_catalog, clean_symbol
 from portfolio_calc import compute_state, valuation, allocation_for_symbol
+from dataclasses import asdict
 from xirr import xirr, build_cashflows
 from storage import init_storage, put_object, get_object, make_upload_path, APP_NAME as STORAGE_APP
 
@@ -321,11 +322,11 @@ async def performance(user=Depends(get_current_user)):
 @api.get("/market/tickers")
 async def list_tickers(q: Optional[str] = None, limit: int = 50, with_price: bool = False):
     prov = get_market_data_provider()
-    rows = [t.__dict__ for t in (search_catalog(q, limit=limit) if q else prov.list_tickers()[:limit])]
+    rows = [asdict(t) if hasattr(t,'__dataclass_fields__') else t.__dict__ for t in (search_catalog(q, limit=limit) if q else prov.list_tickers()[:limit])]
     if with_price:
-        # Enrich with live/reference quote if available. Missing prices → price:null
         symbols = [r["symbol"] for r in rows]
-        quotes = prov.get_quotes(symbols)
+        # Run the possibly-network-bound batch off the event loop
+        quotes = await run_in_threadpool(prov.get_quotes, symbols)
         for r in rows:
             q_ = quotes.get(r["symbol"])
             r["price"] = q_.price if q_ else None
@@ -540,7 +541,79 @@ async def feed(request: Request, limit: int = 30):
     except HTTPException:
         pass
     posts = await db.posts.find({}, {"_id": 0}).sort("created_at", -1).to_list(limit)
-    return [await _hydrate_post(p, viewer) for p in posts]
+    if not posts:
+        return []
+
+    # Batch prefetch to avoid the classic N+1: authors, likes, comments, and
+    # market quotes for every author's held tickers.
+    author_ids = list({p["author_id"] for p in posts})
+    post_ids = [p["id"] for p in posts]
+    authors_arr = await db.users.find({"id": {"$in": author_ids}}, {"password_hash": 0, "_id": 0}).to_list(200)
+    authors = {a["id"]: a for a in authors_arr}
+
+    # Likes/comments counts in one aggregation each
+    likes_pipe = [{"$match": {"post_id": {"$in": post_ids}}}, {"$group": {"_id": "$post_id", "n": {"$sum": 1}}}]
+    comments_pipe = [{"$match": {"post_id": {"$in": post_ids}}}, {"$group": {"_id": "$post_id", "n": {"$sum": 1}}}]
+    likes_counts = {r["_id"]: r["n"] async for r in db.likes.aggregate(likes_pipe)}
+    comments_counts = {r["_id"]: r["n"] async for r in db.comments.aggregate(comments_pipe)}
+    liked_set = set()
+    if viewer:
+        liked_set = {l["post_id"] async for l in db.likes.find({"post_id": {"$in": post_ids}, "user_id": viewer})}
+
+    # For each author with a disclosure post, batch-load their tx symbols + quotes ONCE
+    authors_with_disclosure = list({p["author_id"] for p in posts if p.get("disclosure")})
+    author_symbols: Dict[str, set] = {aid: set() for aid in authors_with_disclosure}
+    author_txs: Dict[str, list] = {}
+    if authors_with_disclosure:
+        # IMPORTANT: fetch ALL transactions per author (including deposit/withdraw/dividend).
+        # allocation_for_symbol needs the full state including cash to compute correct % weights.
+        cursor = db.transactions.find({"user_id": {"$in": authors_with_disclosure}}, {"_id": 0})
+        async for t in cursor:
+            author_txs.setdefault(t["user_id"], []).append(t)
+            sym = (t.get("ticker") or "").upper()
+            if sym:
+                author_symbols[t["user_id"]].add(sym)
+    all_symbols = list({s for ss in author_symbols.values() for s in ss})
+    quotes_all: Dict[str, float] = {}
+    if all_symbols:
+        provider = get_market_data_provider()
+        # ONE parallel batched fetch instead of N per-post fetches
+        quotes = await run_in_threadpool(provider.get_quotes, all_symbols)
+        quotes_all = {s: q.price for s, q in quotes.items()}
+
+    def _current_for(author_id: str, symbol: str) -> Optional[float]:
+        txs = author_txs.get(author_id) or []
+        if not txs:
+            return None
+        alloc, _ = allocation_for_symbol(txs, quotes_all, symbol)
+        return alloc
+
+    out = []
+    for p in posts:
+        raw_disc = p.get("disclosure")
+        disc_out = _sanitize_disclosure(raw_disc)
+        current = None
+        change_status = None
+        if raw_disc and raw_disc.get("show_allocation", True):
+            cur_alloc = _current_for(p["author_id"], raw_disc["ticker"])
+            if cur_alloc is not None:
+                cur_alloc = round(cur_alloc, 4)
+                current = {"allocation_pct": cur_alloc}
+                change_status = _change_status(raw_disc.get("underlying_allocation_pct"), cur_alloc)
+        if disc_out is not None:
+            disc_out["change_status"] = change_status
+        author = authors.get(p["author_id"])
+        out.append({
+            "id": p["id"], "author_id": p["author_id"], "text": p["text"],
+            "tickers": p.get("tickers", []), "image_url": p.get("image_url"),
+            "video_url": p.get("video_url"), "created_at": p["created_at"],
+            "disclosure": disc_out, "current_position": current,
+            "author": public_user(author) if author else None,
+            "likes_count": likes_counts.get(p["id"], 0),
+            "comments_count": comments_counts.get(p["id"], 0),
+            "liked": p["id"] in liked_set,
+        })
+    return out
 
 @api.get("/posts/{post_id}")
 async def get_post(post_id: str, request: Request):
@@ -899,6 +972,17 @@ async def startup():
         log.info("Demo seeding complete.")
     except Exception as e:
         log.exception("Seeding failed: %s", e)
+    # Pre-warm the market-data cache for popular BIST symbols so the first
+    # /portfolio and /market/search calls are instant.
+    async def _prewarm():
+        try:
+            from market_data import _DEMO_PRICES
+            prov = get_market_data_provider()
+            await run_in_threadpool(prov.get_quotes, list(_DEMO_PRICES.keys()))
+            log.info("Market cache pre-warmed: %d symbols", len(_DEMO_PRICES))
+        except Exception as e:
+            log.warning("Prewarm failed: %s", e)
+    asyncio.create_task(_prewarm())
 
 @app.on_event("shutdown")
 async def shutdown():
