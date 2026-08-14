@@ -49,7 +49,10 @@ export default function Portfolio() {
       {/* Return metrics row */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
         <KPI title="Gerçekleşen K/Z" value={<span className={`tabular ${(p.total_realized_pl||0)>=0?"text-pos":"text-neg"}`}>{money(p.total_realized_pl)}</span>} testId="kpi-realized"/>
-        <KPI title="Gerçekleşmemiş K/Z" value={<span className={`tabular ${(p.total_unrealized_pl||0)>=0?"text-pos":"text-neg"}`}>{money(p.total_unrealized_pl)}</span>} testId="kpi-unrealized"/>
+        <KPI title="Toplam Temettü" testId="kpi-dividends"
+          value={<span className="tabular text-violet">{money(p.total_dividends)}</span>}
+          sub={<span className="text-xs text-mute">Kaydettiğiniz temettü işlemlerinden</span>}
+        />
         <KPI title="XIRR (yıllıklandırılmış)" testId="kpi-xirr"
           value={p.xirr == null
             ? <span className="text-mute text-base">Yeterli veri yok</span>
@@ -124,6 +127,42 @@ export default function Portfolio() {
             </table>
           </div>
         )}
+      </div>
+
+      {/* Transactions */}
+      <div className="rounded-2xl border border-line bg-white">
+        <div className="p-4 md:p-5 border-b border-line flex items-center justify-between">
+          <div className="font-heading font-semibold">Temettü Geçmişi</div>
+          <span className="text-xs text-mute">Kullanıcı tarafından girilen temettü işlemleri</span>
+        </div>
+        {(() => {
+          const divs = txs.filter(t => t.type === "dividend");
+          if (divs.length === 0) return <div className="p-8 text-center text-sm text-mute" data-testid="divs-empty">Henüz temettü kaydı yok. Yeni işlem → "Temettü" ile ekleyebilirsiniz.</div>;
+          const totals = {};
+          divs.forEach(d => { const k = d.ticker || "—"; totals[k] = (totals[k] || 0) + Number(d.amount || 0); });
+          return (
+            <div>
+              <div className="flex flex-wrap gap-2 p-4 md:p-5 border-b border-line" data-testid="divs-by-ticker">
+                {Object.entries(totals).sort((a,b)=>b[1]-a[1]).map(([sym, sum]) => (
+                  <span key={sym} className="inline-flex items-center gap-2 text-xs px-3 py-1.5 rounded-full bg-violet-soft text-violet font-heading font-semibold">
+                    {sym} <span className="tabular text-ink font-bold">{money(sum)}</span>
+                  </span>
+                ))}
+              </div>
+              <ul className="divide-y divide-line">
+                {[...divs].reverse().map(d => (
+                  <li key={d.id} className="px-4 py-3 flex items-center gap-3 text-sm" data-testid={`div-${d.id}`}>
+                    <span className="text-xs font-semibold uppercase tracking-wider text-violet min-w-[70px]">Temettü</span>
+                    <span className="font-heading font-semibold w-16">{d.ticker || "—"}</span>
+                    <span className="flex-1 text-mute truncate">{d.note || <span className="italic">not yok</span>}</span>
+                    <span className="tabular text-mute">{new Date(d.date).toLocaleDateString('tr-TR')}</span>
+                    <span className="tabular font-medium text-violet">{money(d.amount)}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          );
+        })()}
       </div>
 
       {/* Transactions */}

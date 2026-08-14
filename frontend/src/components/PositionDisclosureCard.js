@@ -10,19 +10,19 @@ export default function PositionDisclosureCard({ disclosure, current }) {
 
   const publishedPct = disclosure.disclosed_allocation_pct;
   const publishedRange = disclosure.disclosed_range;
-  const publishedHidden = !disclosure.show_allocation;
-  const publishedUnderlying = disclosure.underlying_allocation_pct;
+  const publishedHidden = !disclosure.show_allocation || disclosure.allocation_mode === "hidden";
   const currentAlloc = current?.allocation_pct ?? null;
 
-  // Change indicator relative to underlying (accurate) allocation at publication
-  let status = null;
-  if (currentAlloc != null && publishedUnderlying != null) {
-    const diff = currentAlloc - publishedUnderlying;
-    if (Math.abs(diff) < 0.05) status = { label: "Değişmedi", icon: Minus, color: "text-mute", bg: "bg-surface" };
-    else if (currentAlloc <= 0.05) status = { label: "Kapatıldı", icon: Circle, color: "text-mute", bg: "bg-surface" };
-    else if (diff > 0) status = { label: "Artırdı", icon: ArrowUp, color: "text-pos", bg: "bg-brand-soft" };
-    else status = { label: "Azalttı", icon: ArrowDown, color: "text-neg", bg: "bg-orangeSoft" };
-  }
+  // Status label comes from the backend — the underlying private value is never exposed to the client.
+  const status = (() => {
+    switch (disclosure.change_status) {
+      case "increased": return { label: "Artırdı", icon: ArrowUp, color: "text-pos", bg: "bg-brand-soft" };
+      case "reduced":   return { label: "Azalttı", icon: ArrowDown, color: "text-neg", bg: "bg-orangeSoft" };
+      case "unchanged": return { label: "Değişmedi", icon: Minus, color: "text-mute", bg: "bg-surface" };
+      case "closed":    return { label: "Kapatıldı", icon: Circle, color: "text-mute", bg: "bg-surface" };
+      default:          return null;
+    }
+  })();
 
   return (
     <div className="rounded-2xl border border-line bg-surface p-4 md:p-5" data-testid="position-disclosure-card">

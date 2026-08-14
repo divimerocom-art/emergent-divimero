@@ -311,9 +311,21 @@ async def performance(user=Depends(get_current_user)):
 
 # --- Market data ------------------------------------------------------------
 @api.get("/market/tickers")
-async def list_tickers():
+async def list_tickers(q: Optional[str] = None, limit: int = 200):
     prov = get_market_data_provider()
-    return [t.__dict__ for t in prov.list_tickers()]
+    rows = [t.__dict__ for t in prov.list_tickers()]
+    if q:
+        needle = q.strip().lower()
+        rows = [r for r in rows if needle in r["symbol"].lower() or needle in r["name"].lower()]
+        # Prefer symbol prefix matches at the top
+        rows.sort(key=lambda r: (0 if r["symbol"].lower().startswith(needle) else 1, r["symbol"]))
+    return rows[:limit]
+
+
+@api.get("/market/search")
+async def search_market(q: str, limit: int = 25):
+    """Case-insensitive instrument search by ticker OR company name."""
+    return await list_tickers(q=q, limit=limit)
 
 @api.get("/market/quote/{symbol}")
 async def get_quote(symbol: str):
@@ -420,6 +432,38 @@ async def _current_allocation(author_id: str, ticker: str) -> dict:
     alloc, qty = allocation_for_symbol(txs, quotes, ticker)
     return {"allocation_pct": round(alloc, 4), "quantity": qty}
 
+def _sanitize_disclosure(d: Optional[dict]) -> Optional[dict]:
+    """Strip privately-stored fields from a disclosure snapshot before it leaves the API.
+    The stored document contains BOTH the disclosed value (what the user consented to
+    publish) and the underlying value (kept internally so we can compute change status
+    without re-reading portfolio history). Only the disclosed values ever leave the API.
+    """
+    if not d:
+        return None
+    return {
+        "ticker": d.get("ticker"),
+        "disclosed_allocation_pct": d.get("disclosed_allocation_pct"),
+        "disclosed_range": d.get("disclosed_range"),
+        "show_allocation": d.get("show_allocation", True),
+        "allocation_mode": d.get("allocation_mode", "exact"),
+        "show_quantity": d.get("show_quantity", False),
+        "show_value": d.get("show_value", False),
+        "source": d.get("source", "self_reported"),
+        "snapshot_at": d.get("snapshot_at"),
+    }
+
+
+def _change_status(underlying_pub: Optional[float], current_pct: Optional[float]) -> Optional[str]:
+    if underlying_pub is None or current_pct is None:
+        return None
+    if current_pct <= 0.05:
+        return "closed"
+    diff = current_pct - underlying_pub
+    if abs(diff) < 0.1:
+        return "unchanged"
+    return "increased" if diff > 0 else "reduced"
+
+
 async def _hydrate_post(post: dict, viewer_id: Optional[str]) -> dict:
     author = await db.users.find_one({"id": post["author_id"]}, {"password_hash": 0, "_id": 0})
     likes_count = await db.likes.count_documents({"post_id": post["id"]})
@@ -427,16 +471,32 @@ async def _hydrate_post(post: dict, viewer_id: Optional[str]) -> dict:
     liked = False
     if viewer_id:
         liked = bool(await db.likes.find_one({"post_id": post["id"], "user_id": viewer_id}))
+    raw_disc = post.get("disclosure")
+    disc_out = _sanitize_disclosure(raw_disc)
     current = None
-    if post.get("disclosure"):
-        current = await _current_allocation(post["author_id"], post["disclosure"]["ticker"])
+    change_status = None
+    if raw_disc:
+        # Compute current allocation only if the author actually disclosed the allocation.
+        if raw_disc.get("show_allocation", True):
+            cur = await _current_allocation(post["author_id"], raw_disc["ticker"])
+            current = {"allocation_pct": cur["allocation_pct"]}  # never leak qty
+            change_status = _change_status(raw_disc.get("underlying_allocation_pct"), cur["allocation_pct"])
+        if disc_out is not None:
+            disc_out["change_status"] = change_status
     return {
-        **post,
+        "id": post["id"],
+        "author_id": post["author_id"],
+        "text": post["text"],
+        "tickers": post.get("tickers", []),
+        "image_url": post.get("image_url"),
+        "video_url": post.get("video_url"),
+        "created_at": post["created_at"],
+        "disclosure": disc_out,
+        "current_position": current,
         "author": public_user(author) if author else None,
         "likes_count": likes_count,
         "comments_count": comments_count,
         "liked": liked,
-        "current_position": current,
     }
 
 @api.get("/feed")
@@ -503,27 +563,40 @@ async def user_posts(username: str, request: Request):
 
 @api.get("/users/{username}/disclosures")
 async def user_disclosures(username: str):
-    """Return only the tickers the user has voluntarily disclosed via posts."""
+    """Return only the tickers the user has voluntarily disclosed via posts.
+    History uses the disclosed allocation values, NOT the underlying private values.
+    Posts with show_allocation=False (or mode='hidden') do not contribute a numeric
+    history point — they are counted only via ticker presence.
+    """
     u = await db.users.find_one({"username": username.lower()})
     if not u:
         raise HTTPException(404, "Kullanıcı bulunamadı")
     posts = await db.posts.find({"author_id": u["id"], "disclosure": {"$ne": None}}, {"_id": 0}).sort("created_at", 1).to_list(500)
     by_ticker: dict = {}
     for p in posts:
-        d = p.get("disclosure")
-        if not d: continue
-        t = d["ticker"]
-        entry = by_ticker.setdefault(t, {"ticker": t, "history": []})
-        entry["history"].append({
-            "post_id": p["id"], "date": p["created_at"],
-            "allocation_at_publication": d["underlying_allocation_pct"],
-        })
-    # attach current allocation
+        d = p.get("disclosure") or {}
+        t = d.get("ticker")
+        if not t:
+            continue
+        entry = by_ticker.setdefault(t, {"ticker": t, "history": [], "last_disclosed": None, "opened_at": p["created_at"]})
+        entry["opened_at"] = min(entry["opened_at"], p["created_at"])
+        # Only add a numeric history point if the user disclosed a value in this post
+        if d.get("show_allocation") and d.get("allocation_mode") in (None, "exact") and d.get("disclosed_allocation_pct") is not None:
+            entry["history"].append({
+                "post_id": p["id"], "date": p["created_at"],
+                "disclosed_allocation_pct": d["disclosed_allocation_pct"],
+            })
+            entry["last_disclosed"] = d["disclosed_allocation_pct"]
+        elif d.get("show_allocation") and d.get("allocation_mode") == "range" and d.get("disclosed_range"):
+            entry["history"].append({
+                "post_id": p["id"], "date": p["created_at"],
+                "disclosed_range": d["disclosed_range"],
+            })
+    # attach current allocation + change_status only if the user has publicly disclosed a value at least once
     for t, entry in by_ticker.items():
         cur = await _current_allocation(u["id"], t)
-        entry["current"] = cur
-        entry["opened_at"] = entry["history"][0]["date"]
-        entry["last_disclosed"] = entry["history"][-1]["allocation_at_publication"]
+        entry["current"] = {"allocation_pct": cur["allocation_pct"]}  # never leak qty
+        entry["change_status"] = _change_status(entry.get("last_disclosed"), cur["allocation_pct"]) if entry.get("last_disclosed") is not None else None
     return list(by_ticker.values())
 
 # --- Uploads (Emergent Object Storage) -------------------------------------
@@ -713,7 +786,6 @@ async def delete_alert(alert_id: str, user=Depends(get_current_user)):
 
 
 @api.get("/notifications")
-@api.get("/notifications")
 async def list_notifications(user=Depends(get_current_user), limit: int = 30):
     rows = await db.notifications.find({"user_id": user["id"]}, {"_id": 0}).sort("created_at", -1).to_list(limit)
     unread = await db.notifications.count_documents({"user_id": user["id"], "read": False})
@@ -737,7 +809,7 @@ async def mark_all_read(user=Depends(get_current_user)):
 # --- Debug/system ---
 @api.get("/")
 async def root():
-    return {"app": "Divimero", "status": "ok", "market_data_source": "demo"}
+    return {"app": "Divimero", "status": "ok", "market_data_source": get_market_data_provider().name}
 
 # --- Startup ---
 app.include_router(api)

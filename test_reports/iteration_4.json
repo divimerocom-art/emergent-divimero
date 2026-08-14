@@ -1,0 +1,64 @@
+{
+  "summary": "Iteration 4 post-fix retest, focused on the CRITICAL disclosure privacy leak from iteration 3. RESULT: the privacy leak is FIXED and verified independently. Backend: 61 passed / 1 skipped across /app/backend/tests/ (existing test_privacy_probe.py + test_iteration3.py both fully green, plus a new test_iteration4.py with 12 targeted cases and test_media_range.py). Verified by raw curl + pytest: (a) GET /api/feed and GET /api/posts/{id} disclosure objects now contain ONLY {ticker, disclosed_allocation_pct, disclosed_range, show_allocation, allocation_mode, show_quantity, show_value, source, snapshot_at, change_status} — zero occurrences of underlying_allocation_pct / underlying_quantity / allocation_at_publication anywhere in the payloads; change_status is always one of increased|reduced|closed|unchanged|null; current_position is null or exactly {allocation_pct}; (b) throwaway account posting show_allocation=false + allocation_mode='hidden' -> POST /posts returns current_position=null and /users/{u}/disclosures returns last_disclosed=null, history=[], change_status=null, no leaked keys; (c) /users/deniz.yatirim/disclosures: THYAO last_disclosed=2.6 change_status='reduced', ASTOR last_disclosed=4.2 (the LATER disclosed value, not 8.4/underlying), history rows carry only post_id/date/disclosed_allocation_pct, current={allocation_pct} only; (d) GET /api/ now reports market_data_source='yahoo'; (e) GET /api/notifications registered exactly once (asserted against app.routes). Frontend smoke (Chromium 1920x1080): /feed (after login) renders 4 PositionDisclosureCards — ASTOR 4,20->8,05 Artirdi, THYAO 2,60->1,85 Azaltti, ASTOR 8,40->8,05 Azaltti, THYAO 6,18->1,85 Azaltti — no underlying_*/undefined/NaN in the DOM; /u/deniz.yatirim allocation bar chips now show ASTOR %4,20, THYAO %2,60, Beyan edilmemis %93,20 (i.e. last_disclosed, NOT the live 8,05/1,85 weights) while the per-row 'Guncel' column still shows the live values as designed. Regression OK: instrument search finds ASTOR, ticker strip (Piyasa Nabzi, live Yahoo movers) loads, XIRR KPI shows %43,90, dividend flow +500 increments total_dividends 2900->3400 and cash without changing ASTOR quantity (then rolled back to 2900), alerts CRUD (POST/GET/PATCH/DELETE) OK, alerts page loads, notifications bell opens the panel, media upload returns /api/media/{id} and serves 200 + 206 with correct Content-Range + 416 on an unsatisfiable range. Demo data verified intact afterwards (Deniz 12 txs, 6 posts, 0 alerts); all TEST_ users/posts purged.",
+  "backend_issues": {
+    "critical": [],
+    "minor": [
+      {"endpoint": "GET /api/feed + GET /api/users/{u}/disclosures", "issue": "change_status is computed from DIFFERENT baselines on the two endpoints: _hydrate_post uses the private disclosure.underlying_allocation_pct while user_disclosures uses the public last_disclosed. Same ticker can therefore disagree between surfaces, and the feed's arrow is still derived from the undisclosed private number (a coarse inference channel about a value the user did not publish). Pick one baseline — the disclosed value — for both."},
+      {"endpoint": "CORS middleware (server.py L817-822)", "issue": "allow_origins=['*'] with allow_credentials=False. Login sets httpOnly/secure/samesite=none cookies, but with credentials disallowed the browser can never send them cross-origin, so the cookie auth path is dead code and the playbook requirement (explicit origins + allow_credentials=True) is not met. Frontend only works because it uses the Bearer token from localStorage."},
+      {"endpoint": "POST /api/auth/login", "issue": "No brute-force protection. 7 consecutive wrong-password attempts on deniz@divimero.com all returned 401 with no lockout/throttle, and the 8th correct login returned 200. Playbook expects lockout after 5 failures."},
+      {"endpoint": "seed_demo.seed_all (admin block)", "issue": "The admin user is only INSERTED when missing; if ADMIN_PASSWORD changes the existing admin row keeps the old hash. Playbook expects seed to update the password hash on an existing admin."},
+      {"endpoint": "POST /api/auth/refresh", "issue": "Returns 404 — the endpoint documented in /app/memory/test_credentials.md ('JWT access 15 min + refresh 7 days') does not exist. Reality: single access token with ACCESS_TTL_MIN = 7 days. Harmless functionally, but the credentials doc is wrong and should be corrected."},
+      {"endpoint": "POST /api/uploads / db.files", "issue": "66 orphan documents in db.files; media records are never removed when a post is deleted (no GC), so uploads accumulate indefinitely."},
+      {"endpoint": "GET /api/portfolio/performance", "issue": "Still re-values the whole portfolio per transaction (N valuations, N quote lookups) — carried over from iteration 3, unfixed."},
+      {"endpoint": "GET /api/market/tickers", "issue": "Still no pagination metadata and the frontend InstrumentPicker still fires one XHR per keystroke (no debounce) — carried over from iteration 3, unfixed."}
+    ]
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [
+      {"flow": "Golden demo — ASTOR narrative (carried over from iteration 3, still UNFIXED)", "issue": "The 2nd ASTOR post says 'ASTOR pozisyonumu %8'den yaklasik yarisina indirdim' and discloses %4,20, but the live position is %8,05, so the card renders '%4,20 -> %8,05  ↑ Artirdi' and the profile row reads 'Son beyan %4,20 / Guncel %8,05 Artirdi'. seed_demo never writes the ASTOR trim sell, so the demo copy still contradicts the widget. Add the sell tx or reword the post.", "affected_selectors": ["position-disclosure-card", "disc-ASTOR"]},
+      {"flow": "/feed while unauthenticated", "issue": "Navigating to /feed without a session redirects to /login, so the public landing surface is auth-gated while /u/{username} is public. Confirm this is intended — an unauthenticated visitor cannot see any feed content.", "affected_selectors": ["position-disclosure-card"]}
+    ],
+    "design_issues": [
+      {"screen": "Portfolio", "issues": ["Missing data-testid for the headline KPI (kpi-total-value not found); kpi-xirr and kpi-dividends exist, so the set is inconsistent for automation.", "Recharts still logs 'The width(-1) and height(-1) of chart should be greater than 0' on mount (carried over).", "Performance chart x-axis still ends 2025-08-28 while the series mixes 2025/2026 dates (carried over)."]},
+      {"screen": "Feed / ticker strip", "issues": ["No data-testid on the 'PIYASA NABZI' movers strip — had to fall back to text matching."]},
+      {"screen": "New transaction (/portfolio/new)", "issues": ["Still uses the native <input type=date> picker instead of the shadcn Calendar/Popover (carried over from iteration 3)."]}
+    ]
+  },
+  "test_report_links": [
+    "/app/backend/tests/test_iteration4.py",
+    "/app/backend/tests/test_media_range.py",
+    "/app/backend/tests/test_privacy_probe.py",
+    "/app/backend/tests/test_iteration3.py",
+    "/app/backend/tests/conftest.py",
+    "/app/test_reports/pytest/pytest_results.xml"
+  ],
+  "action_items": [
+    "Unify change_status: compute it from the DISCLOSED value on /feed too (currently uses the private underlying_allocation_pct), so /feed and /users/{u}/disclosures agree and no private baseline influences public output.",
+    "Fix the ASTOR demo narrative (seed the trim sell or reword the post) — still shows 'halved the position' next to '↑ Artirdi %4,20 -> %8,05'.",
+    "CORS: replace allow_origins=['*'] / allow_credentials=False with the explicit frontend origin + allow_credentials=True, otherwise drop the httpOnly cookie code as dead.",
+    "Add brute-force lockout (5 failed logins) on POST /api/auth/login.",
+    "seed_demo: update the existing admin's password_hash when ADMIN_PASSWORD differs, instead of skipping.",
+    "Correct /app/memory/test_credentials.md: there is no /api/auth/refresh and the access token TTL is 7 days, not 15 minutes.",
+    "Add data-testid to the total-value KPI and the market movers strip; GC orphan db.files records on post deletion."
+  ],
+  "critical_code_review_comments": [
+    "The privacy fix is structurally correct: _sanitize_disclosure builds an explicit allow-list dict instead of spreading the stored document, and _hydrate_post no longer returns {**post}. Keep this pattern for any new privacy-sensitive field.",
+    "_change_status(underlying_pub, current) is called with the PRIVATE value in _hydrate_post but with the PUBLIC last_disclosed in user_disclosures — same function, two semantics. This is a latent correctness/privacy inconsistency, not a cosmetic one.",
+    "user_disclosures' history filter only accepts allocation_mode in (None, 'exact') for exact values and 'range' for ranges; any future mode silently drops the point without a log — add an explicit else/log branch.",
+    "server.py is now 853 lines with auth, portfolio, market, social, uploads, notifications and alerts in one module — split into routers (carried over).",
+    "server.py still uses deprecated @app.on_event('startup'/'shutdown') — migrate to the lifespan handler (emits DeprecationWarning on import)."
+  ],
+  "updated_files": [
+    "/app/backend/tests/test_iteration4.py",
+    "/app/backend/tests/test_media_range.py",
+    "/app/backend/tests/conftest.py"
+  ],
+  "success_rate": {"backend": "100% (61 passed, 1 skipped — the skip is a superseded in-feed media probe, replaced by test_media_range.py)", "frontend": "100% of the requested smoke flows (feed disclosure cards, profile allocation bar via last_disclosed, ticker strip, XIRR KPI, notifications bell, alerts page)"},
+  "seed_data_creation": "No re-seed. Temporary only: 1 throwaway user (TEST_it4_*) with 2 transactions and 1 hidden-mode post, 1 dividend tx + 1 alert on Deniz, 1 uploaded PNG — all deleted. Verified post-run: Deniz 12 txs / 6 posts / 0 alerts, total_dividends back to 2900, 0 TEST posts, 0 TEST users. Pre-existing orphan user rows t1786653145 and eliferol remain (no posts/transactions) — left untouched as in iteration 3.",
+  "should_call_test_agent_after_fix": false,
+  "should_main_agent_self_test": true,
+  "test_credentials": "deniz@divimero.com / demo1234, ece@divimero.com / demo1234, admin@divimero.com / admin123 (all verified working; admin login returns 200)",
+  "context_for_next_testing_agent": "Run `pytest /app/backend/tests/ -q` from /app/backend (pytest.ini already sets -n 2 --dist loadscope). IMPORTANT FIX I MADE: the old session-scoped autouse purge_test_artifacts fixture in conftest.py ran inside EVERY xdist worker, so the first worker to finish deleted the throwaway TEST_ user another worker was still authenticated as, causing an intermittent 401 'Kullanici bulunamadi' (reproduced 2/6 runs). It is now a pytest_sessionfinish hook that returns early when config.workerinput exists, so cleanup happens once in the controller. Suite is now stable: 5 consecutive runs = 61 passed / 1 skipped. Golden DB values: Deniz 12 txs, total_dividends 2900, ASTOR 70 sh ~%8,05, THYAO 18 sh ~%1,85, cash 102.895, total value ~300.314, XIRR ~%43,9. Prices are LIVE Yahoo — assert allocations with tolerance. Disclosure API contract to guard: feed/post disclosure keys are an explicit allow-list + change_status; current_position is null or {allocation_pct} only.",
+  "rca_of_the_issue": "Iteration-3 leak RCA confirmed resolved: _snapshot_disclosure still stores underlying_allocation_pct / underlying_quantity in the embedded document (needed to compute change status), but the values no longer cross the API boundary because _hydrate_post now serialises through _sanitize_disclosure's explicit allow-list instead of spreading the post document, and /users/{u}/disclosures builds history from disclosed_allocation_pct / disclosed_range only, skipping posts where show_allocation is false or allocation_mode='hidden' (those rows keep last_disclosed=null, history=[], change_status=null). The Profile allocation bar was switched to d.last_disclosed, so the public bar no longer republishes live portfolio changes. Remaining residual: the feed's change_status is still derived from the private underlying value, which leaks the DIRECTION (not the magnitude) of an undisclosed change and makes the two endpoints disagree — reported as a minor issue."
+}

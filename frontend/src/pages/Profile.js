@@ -73,22 +73,69 @@ export default function Profile() {
       {disc.length > 0 && (
         <div className="rounded-2xl border border-line bg-white">
           <div className="p-4 md:p-5 border-b border-line">
-            <h2 className="font-heading font-semibold">Beyan Edilen Pozisyonlar</h2>
-            <p className="text-xs text-mute">Yalnızca kullanıcının gönderilerde açıkça paylaştığı pozisyonlar listelenir.</p>
+            <h2 className="font-heading font-semibold">Portföy Özeti — Beyan Edilen Pozisyonlar</h2>
+            <p className="text-xs text-mute">Yalnızca kullanıcının gönderilerde açıkça paylaştığı ağırlıklar gösterilir. Adet ve tutar gizli tutulur.</p>
           </div>
+          {/* Compact allocation bar (uses only DISCLOSED values, never live private data) */}
+          {(() => {
+            const rows = disc
+              .filter(d => d.last_disclosed != null)
+              .map(d => ({ ticker: d.ticker, val: Math.max(0, d.last_disclosed) }))
+              .sort((a,b)=>b.val-a.val);
+            const colors = ["#35C7B2","#7361F7","#FF7733","#D6B130","#12BD57","#171717"];
+            const shown = rows.slice(0, 5);
+            const totalShown = shown.reduce((s,r)=>s+r.val, 0);
+            const remainingPct = Math.max(0, 100 - totalShown);
+            return (
+              <div className="p-4 md:p-5 border-b border-line" data-testid="alloc-bar">
+                {rows.length === 0 ? (
+                  <div className="text-xs text-mute">Bu kullanıcı henüz oran paylaşmadı — sadece hisse etiketleri açıklanmış.</div>
+                ) : (
+                  <>
+                    <div className="h-3 rounded-full overflow-hidden flex bg-surface">
+                      {shown.map((r, i) => (
+                        <div key={r.ticker} title={`${r.ticker} · ${r.val.toFixed(1)}% (son beyan)`} style={{ width: `${r.val}%`, background: colors[i % colors.length] }} data-testid={`alloc-seg-${r.ticker}`}/>
+                      ))}
+                      {remainingPct > 0 && <div title={`Beyan edilmemiş · ${remainingPct.toFixed(1)}%`} style={{ width: `${remainingPct}%`, background: "#E3E3E3" }}/>}
+                    </div>
+                    <div className="mt-3 flex flex-wrap gap-3 text-xs">
+                      {shown.map((r,i) => (
+                        <span key={r.ticker} className="inline-flex items-center gap-1.5">
+                          <span className="h-2 w-2 rounded-full" style={{ background: colors[i % colors.length] }}/>
+                          <span className="font-heading font-semibold">{r.ticker}</span>
+                          <span className="tabular text-mute">{pct(r.val)}</span>
+                        </span>
+                      ))}
+                      {remainingPct > 0 && (
+                        <span className="inline-flex items-center gap-1.5">
+                          <span className="h-2 w-2 rounded-full bg-line"/>
+                          <span className="text-mute">Beyan edilmemiş</span>
+                          <span className="tabular text-mute">{pct(remainingPct)}</span>
+                        </span>
+                      )}
+                    </div>
+                    <p className="text-[10px] text-mute mt-2">Kişisel beyan · Adet ve tutar gizli · Yalnızca gönderilerde açıkça paylaşılan son beyan oranları kullanıldı.</p>
+                  </>
+                )}
+              </div>
+            );
+          })()}
           <ul className="divide-y divide-line">
             {disc.map(d => {
               const cur = d.current?.allocation_pct ?? 0;
-              const last = d.last_disclosed ?? 0;
-              const diff = cur - last;
-              const trend = Math.abs(diff) < 0.1 ? "Değişmedi" : diff > 0 ? "Artırdı" : cur < 0.1 ? "Kapatıldı" : "Azalttı";
-              const c = trend === "Artırdı" ? "text-pos" : trend === "Azalttı" ? "text-neg" : "text-mute";
+              const last = d.last_disclosed;
+              const status = d.change_status;
+              const trend = status === "increased" ? "Artırdı" : status === "reduced" ? "Azalttı" : status === "closed" ? "Kapatıldı" : status === "unchanged" ? "Değişmedi" : "—";
+              const c = status === "increased" ? "text-pos" : status === "reduced" ? "text-neg" : "text-mute";
               return (
-                <li key={d.ticker} className="px-4 md:px-5 py-3 flex items-center gap-4" data-testid={`disc-${d.ticker}`}>
+                <li key={d.ticker} className="px-4 md:px-5 py-3 flex items-center gap-4 flex-wrap" data-testid={`disc-${d.ticker}`}>
                   <span className="font-heading font-semibold w-16">{d.ticker}</span>
-                  <div className="flex-1 text-xs text-mute">İlk beyan: {relTime(d.opened_at)} · Son beyan: {pct(last)}</div>
-                  <div className="tabular font-medium">Güncel {pct(cur)}</div>
-                  <span className={`text-xs font-semibold ${c}`}>{trend}</span>
+                  <div className="flex-1 min-w-0 text-xs text-mute">
+                    İlk beyan: {relTime(d.opened_at)}
+                    {last != null && <> · Son beyan: <b className="text-ink tabular">{pct(last)}</b></>}
+                  </div>
+                  {last != null && <div className="tabular font-medium">Güncel {pct(cur)}</div>}
+                  {status && <span className={`text-xs font-semibold ${c}`}>{trend}</span>}
                 </li>
               );
             })}

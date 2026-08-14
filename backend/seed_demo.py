@@ -90,16 +90,18 @@ async def seed_all(db):
     zeynep = await _upsert_user(db, "zeynep@divimero.com", "zeynep.finance", "Zeynep Demir",
                                  "Kısa vadeli ticaret. Grafiklere odaklı.", demo_pw, None)
 
-    # 1. Deniz transactions — deposit + buys → ~6% THYAO, plus a later partial sell
-    # Deposit 200,000 TL
+    # 1. Deniz transactions — deposit + buys → ~6% THYAO, ~8% ASTOR, plus a later partial sell
     await _add_tx(db, deniz, "deposit", "2025-07-01T09:00:00+00:00", amount=200000, note="İlk yatırım")
-    # Buys
     await _add_tx(db, deniz, "buy", "2025-07-05T10:00:00+00:00", ticker="THYAO", qty=30, price=280.0, fees=25, note="THYAO alım")
     await _add_tx(db, deniz, "buy", "2025-07-06T10:00:00+00:00", ticker="TUPRS", qty=100, price=155.0, fees=30, note="TUPRS alım")
     await _add_tx(db, deniz, "buy", "2025-07-08T10:00:00+00:00", ticker="ASELS", qty=200, price=85.0, fees=30, note="ASELS alım")
+    await _add_tx(db, deniz, "buy", "2025-07-10T10:00:00+00:00", ticker="ASTOR", qty=140, price=118.0, fees=30, note="ASTOR alım")
     await _add_tx(db, deniz, "buy", "2025-07-12T10:00:00+00:00", ticker="BIMAS", qty=40, price=490.0, fees=30, note="BIMAS alım")
     await _add_tx(db, deniz, "buy", "2025-07-15T10:00:00+00:00", ticker="GARAN", qty=300, price=118.0, fees=30, note="GARAN alım")
     await _add_tx(db, deniz, "buy", "2025-08-12T10:00:00+00:00", ticker="THYAO", qty=8, price=295.0, fees=15, note="THYAO ekleme")
+    # Dividends (recorded by Deniz)
+    await _add_tx(db, deniz, "dividend", "2025-08-05T10:00:00+00:00", ticker="GARAN", amount=1650, note="GARAN nakit temettü")
+    await _add_tx(db, deniz, "dividend", "2025-08-20T10:00:00+00:00", ticker="ASTOR", amount=1250, note="ASTOR nakit temettü")
 
     # 2. Deniz posts
     await _add_post(db, deniz,
@@ -126,6 +128,41 @@ async def seed_all(db):
     await _add_post(db, deniz,
         "THYAO'da kısmi realizasyon yaptım. Ana tez geçerli, ancak %6+ ağırlık portföyüm için yüksekti. Şeffaflık için pozisyon oranımı güncelliyorum.",
         tickers=["THYAO"], disclosure=disc_2, created_at="2025-08-26T09:00:00+00:00")
+
+    # 4b. ASTOR thesis with portfolio-linked disclosure at ~8%, then later trim to ~4%
+    disc_astor_1 = {
+        "ticker": "ASTOR",
+        "underlying_allocation_pct": 8.4,
+        "underlying_quantity": None,
+        "disclosed_allocation_pct": 8.4,
+        "disclosed_range": None,
+        "show_allocation": True, "allocation_mode": "exact",
+        "show_quantity": False, "show_value": False,
+        "source": "self_reported",
+        "snapshot_at": "2025-08-15T09:00:00+00:00",
+    }
+    astor_post = await _add_post(db, deniz,
+        "ASTOR tezim: Türkiye'nin transformer ve OSB elektrifikasyon talebi güçleniyor. Uzun vadeli tuttuğum bir pozisyon. "
+        "Portföyümdeki oranı açıkça paylaşıyorum, adet ve tutar gizli.",
+        tickers=["ASTOR"], disclosure=disc_astor_1, created_at="2025-08-15T09:00:00+00:00")
+
+    # Later trim of ASTOR
+    await _add_tx(db, deniz, "sell", "2025-08-28T10:00:00+00:00", ticker="ASTOR", qty=70, price=126.0, fees=30, note="ASTOR ağırlık düşürme")
+    disc_astor_2 = {
+        "ticker": "ASTOR",
+        "underlying_allocation_pct": 4.2,
+        "underlying_quantity": None,
+        "disclosed_allocation_pct": 4.2,
+        "disclosed_range": None,
+        "show_allocation": True, "allocation_mode": "exact",
+        "show_quantity": False, "show_value": False,
+        "source": "self_reported",
+        "snapshot_at": "2025-08-29T09:00:00+00:00",
+    }
+    await _add_post(db, deniz,
+        "ASTOR pozisyonumu %8'den %4'lere indirdim. Ana tez değişmedi — portföy ağırlığı için dengeleme yaptım. "
+        "Not: sonraki fiyat hareketleri güncel oranı tekrar yukarı çekmiş olabilir; bu sayfa canlı ağırlığı gösteriyor.",
+        tickers=["ASTOR"], disclosure=disc_astor_2, created_at="2025-08-29T09:00:00+00:00")
 
     # 5. Another user's normal post + comment on Deniz's post
     await _add_post(db, mert,

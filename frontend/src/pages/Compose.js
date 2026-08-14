@@ -2,17 +2,16 @@ import { useEffect, useState } from "react";
 import { api, pct } from "@/lib/api";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
-import { Lock, TrendingUp, Image as ImageIcon, Video as VideoIcon, X } from "lucide-react";
+import { Lock, TrendingUp, Image as ImageIcon, Video as VideoIcon, X, Info } from "lucide-react";
+import InstrumentPicker from "@/components/InstrumentPicker";
 
 export default function Compose() {
   const nav = useNavigate();
-  const [tickers, setTickers] = useState([]);
   const [portfolio, setPortfolio] = useState(null);
   const [uploading, setUploading] = useState(false);
   const [f, setF] = useState({
@@ -26,15 +25,24 @@ export default function Compose() {
     show_quantity: false,
     show_value: false,
   });
+  const [tagPickerOpen, setTagPickerOpen] = useState(false);
+  const [tagDraft, setTagDraft] = useState("");
 
   useEffect(() => {
-    api.get("/market/tickers").then(r => setTickers(r.data));
     api.get("/portfolio").then(r => setPortfolio(r.data)).catch(()=>{});
   }, []);
 
   const upd = (k, v) => setF((x) => ({ ...x, [k]: v }));
   const heldTickers = portfolio?.holdings?.map(h => h.ticker) || [];
   const previewAlloc = portfolio?.holdings?.find(h => h.ticker === f.disclosure_ticker)?.allocation_pct;
+
+  // Auto-suggest: when a user tags a ticker they currently hold, auto-select it as the disclosure candidate
+  useEffect(() => {
+    if (!f.attach_position) return;
+    if (f.disclosure_ticker) return;
+    const firstHeld = (f.tickers || []).find(t => heldTickers.includes(t));
+    if (firstHeld) upd("disclosure_ticker", firstHeld);
+  }, [f.tickers, f.attach_position, heldTickers.join(",")]); // eslint-disable-line
 
   const submit = async (e) => {
     e.preventDefault();
@@ -46,7 +54,7 @@ export default function Compose() {
       disclosure_ticker: f.attach_position ? f.disclosure_ticker : null,
     };
     if (payload.attach_position && !payload.disclosure_ticker) {
-      toast.error("Lütfen bir hisse seçin"); return;
+      toast.error("Portföye eklemek için bir hisse seçin"); return;
     }
     try {
       const { data } = await api.post("/posts", payload);
@@ -55,10 +63,14 @@ export default function Compose() {
     } catch (e) { toast.error(e.response?.data?.detail || "Yayınlanamadı"); }
   };
 
-  const toggleTag = (sym) => setF((x) => {
-    const has = x.tickers.includes(sym);
-    return { ...x, tickers: has ? x.tickers.filter(t => t !== sym) : [...x.tickers, sym].slice(0, 5) };
-  });
+  const addTag = (sym) => {
+    setF((x) => {
+      if (x.tickers.includes(sym) || x.tickers.length >= 5) return x;
+      return { ...x, tickers: [...x.tickers, sym] };
+    });
+    setTagPickerOpen(false); setTagDraft("");
+  };
+  const removeTag = (sym) => setF((x) => ({ ...x, tickers: x.tickers.filter(t => t !== sym) }));
 
   return (
     <div className="max-w-xl mx-auto">
@@ -73,15 +85,24 @@ export default function Compose() {
 
         <div>
           <Label>Hisse etiketleri (opsiyonel, en fazla 5)</Label>
-          <div className="mt-2 flex flex-wrap gap-2">
-            {tickers.map(t => {
-              const on = f.tickers.includes(t.symbol);
-              return (
-                <button type="button" key={t.symbol} onClick={()=>toggleTag(t.symbol)}
-                  className={`text-xs px-2.5 py-1 rounded-full font-heading font-semibold transition-colors ${on ? "bg-violet text-white" : "bg-violet-soft text-violet hover:bg-violet/20"}`}
-                  data-testid={`tag-${t.symbol}`}>${t.symbol}</button>
-              );
-            })}
+          <div className="mt-2 flex flex-wrap gap-2 items-center">
+            {f.tickers.map((sym) => (
+              <span key={sym} className="inline-flex items-center gap-1 text-xs px-2.5 py-1 rounded-full font-heading font-semibold bg-violet text-white" data-testid={`tag-${sym}`}>
+                ${sym}
+                <button type="button" onClick={()=>removeTag(sym)} className="hover:bg-white/20 rounded-full p-0.5"><X size={12}/></button>
+              </span>
+            ))}
+            {f.tickers.length < 5 && (
+              tagPickerOpen ? (
+                <div className="w-full sm:w-72">
+                  <InstrumentPicker value="" onChange={addTag} testIdPrefix="tag-pick" placeholder="Hisse ara ve etiketle…"/>
+                </div>
+              ) : (
+                <button type="button" onClick={()=>setTagPickerOpen(true)} className="text-xs px-2.5 py-1 rounded-full border border-dashed border-line text-mute hover:bg-surface" data-testid="tag-add">
+                  + Hisse etiketi ekle
+                </button>
+              )
+            )}
           </div>
         </div>
 
@@ -148,13 +169,19 @@ export default function Compose() {
             <div className="mt-4 space-y-3">
               <div>
                 <Label>Portföydeki hisse</Label>
-                <Select value={f.disclosure_ticker} onValueChange={(v)=>upd("disclosure_ticker", v)}>
-                  <SelectTrigger className="rounded-full" data-testid="disclosure-ticker"><SelectValue placeholder="Portföyünüzden bir hisse seçin"/></SelectTrigger>
-                  <SelectContent>
-                    {heldTickers.length === 0 && <div className="p-3 text-xs text-mute">Portföyünüzde hisse yok. Önce alım işlemi ekleyin.</div>}
-                    {heldTickers.map(sym => <SelectItem key={sym} value={sym}>{sym}</SelectItem>)}
-                  </SelectContent>
-                </Select>
+                <InstrumentPicker
+                  value={f.disclosure_ticker}
+                  onChange={(v)=>upd("disclosure_ticker", v)}
+                  restrictTo={heldTickers}
+                  testIdPrefix="disc-inst"
+                  placeholder="Portföyünüzden bir hisse seçin"
+                />
+                {heldTickers.length === 0 && (
+                  <p className="text-xs text-mute mt-1.5 inline-flex items-center gap-1"><Info size={12}/> Portföyünüzde hisse yok. Önce bir alım işlemi ekleyin.</p>
+                )}
+                {f.tickers.includes(f.disclosure_ticker) && heldTickers.includes(f.disclosure_ticker) && (
+                  <p className="text-xs text-brand mt-1.5 inline-flex items-center gap-1"><Info size={12}/> Etiketlediğiniz hisseyi tanıdık — bu pozisyonu paylaşacaksınız.</p>
+                )}
               </div>
 
               <div className="flex items-center justify-between">

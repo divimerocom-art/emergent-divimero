@@ -1,0 +1,60 @@
+{
+  "summary": "Iteration 3 verification of the 4 refinement areas. Backend: 50 pytest cases (new /app/backend/tests/test_iteration3.py + test_privacy_probe.py, plus the iteration-2 suite) -> 49 pass, 1 fails and exposes a genuine privacy leak. Frontend (Playwright, Chromium 1920x1080): instrument search finds ASTOR by symbol (upper/lower case) and by company name ('enerji' -> 6 tickers incl. ASTOR), tx-inst-row-ASTOR selectable, buy 10@130 saves with toast 'İşlem kaydedildi' and lands on /portfolio with ASTOR 70->80; dividend flow adds ASTOR 500 -> kpi-dividends 2.900,00 -> 3.400,00, cash +500, ASTOR quantity UNCHANGED (80), ASTOR chip 1.250 -> 1.750 and new row visible in 'Temettü Geçmişi'; public /u/deniz.yatirim shows 'Portföy Özeti — Beyan Edilen Pozisyonlar' with alloc-bar, alloc-seg-ASTOR/THYAO and zero ₺ characters (unauthenticated AND as Ece); compose disclosure picker is correctly restricted to held tickers (SISE rejected with 'Portföyünüzde eşleşen hisse yok.') and auto-fills to ASTOR from the ticker tag; golden feed renders ASTOR 8,40 / 4,20 and THYAO 6,18 / 2,60 with populated current_position and ↓ Azalttı. Regression OK: login/logout/session persistence, notifications bell, alerts CRUD (POST/GET/PATCH/DELETE), alerts page, feed, media 206. All test-created transactions on Deniz were deleted; golden state restored (12 txs, total_dividends 2900, ASTOR 70 @ %8,05, THYAO 18 @ %1,85).",
+  "backend_issues": {
+    "critical": [
+      {"endpoint": "GET /api/users/{username}/disclosures  (+ GET /api/feed, GET /api/posts/{id})", "issue": "PRIVACY LEAK — the endpoint returns history[].allocation_at_publication taken from disclosure.underlying_allocation_pct and a live current.allocation_pct WITHOUT checking the post's own privacy flags. Reproduced: a post published with show_allocation=false / allocation_mode='hidden' (disclosed_allocation_pct=null) still exposes allocation_at_publication=27.7399 and current=27.7399 to any unauthenticated caller. /api/feed and /api/posts/{id} are worse: _hydrate_post returns the raw disclosure dict verbatim, so underlying_allocation_pct AND underlying_quantity are shipped to every viewer even when show_allocation/show_quantity are false (the UI just doesn't render them). Fix: strip underlying_* server-side and only expose disclosed_allocation_pct / disclosed_range; skip hidden posts in /disclosures. Repro test: tests/test_privacy_probe.py::test_hidden_allocation_is_not_leaked_by_disclosures", "priority": "CRITICAL"}
+    ],
+    "minor": [
+      {"endpoint": "GET /api/", "issue": "Hardcodes market_data_source: 'demo' while MARKET_DATA_PROVIDER=yahoo is actually active — should read get_market_data_provider().name."},
+      {"endpoint": "GET /api/notifications", "issue": "Decorator @api.get('/notifications') is duplicated (server.py L727-728) — registers the same route twice."},
+      {"endpoint": "GET /api/market/tickers", "issue": "Filter + sort run on every request over the full universe with no pagination metadata (no total count) and limit default 200 > universe size; harmless now, but the frontend combobox re-queries on every keystroke with no debounce (InstrumentPicker useEffect on q) — ~1 request per typed character."},
+      {"endpoint": "GET /api/portfolio/performance", "issue": "Re-values the whole portfolio for every transaction (N valuations, N quote lookups); series x-axis mixes 2025 and 2026 dates so the chart's last segment is a flat 1-year line."}
+    ]
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [
+      {"flow": "Public profile allocation summary", "issue": "The 'Beyan Edilen Pozisyonlar' bar/chips are built from d.current.allocation_pct (the author's LIVE weight), not from what was actually disclosed. Copy says 'Yalnızca kullanıcının gönderilerde açıkça paylaştığı ağırlıklar gösterilir' but after I added a test buy the public bar instantly moved 8,05% -> 9,12% although Deniz never published that. This is the same root cause as the backend privacy leak — the public surface tracks the private portfolio in real time.", "affected_selectors": ["alloc-bar", "alloc-seg-ASTOR", "disc-ASTOR"]},
+      {"flow": "Golden demo — ASTOR narrative", "issue": "The 2nd ASTOR post text says 'ASTOR pozisyonumu %8'den yaklaşık yarısına indirdim' and discloses 4,20 while the current position is 8,05 -> the disclosure card shows '↑ Artırdı' and the profile row shows 'Son beyan %4,20 / Güncel %8,05 Artırdı'. seed_demo never writes the ASTOR sell, so the demo story contradicts the widget. Either add the ASTOR trim sell tx or change the post copy.", "affected_selectors": ["position-disclosure-card", "disclosure-status"]}
+    ],
+    "design_issues": [
+      {"screen": "Portfolio (after save)", "issues": ["Sonner toast renders top-center and sits ON TOP of the header nav, hiding the 'Akış/Portföy/Profil' links for ~4s after every save — move the toaster to top-right/bottom or offset below the 56px header."]},
+      {"screen": "Portfolio chart", "issues": ["Recharts logs 'The width(-1) and height(-1) of chart should be greater than 0' on every mount (ResponsiveContainer measured before layout) — add minWidth/minHeight.", "Tooltip stays pinned after the pointer leaves the chart area."]},
+      {"screen": "New transaction (/portfolio/new)", "issues": ["Date field uses the native browser <input type=date> picker instead of the shadcn Calendar/Popover used elsewhere — inconsistent with the visual system."]},
+      {"screen": "InstrumentPicker dropdown", "issues": ["No keyboard navigation (arrow keys / Enter) and no role=listbox/option semantics; rows are plain buttons, so the combobox is mouse-only and not screen-reader friendly."]}
+    ]
+  },
+  "test_report_links": [
+    "/app/backend/tests/test_iteration3.py",
+    "/app/backend/tests/test_privacy_probe.py",
+    "/app/backend/tests/conftest.py",
+    "/app/test_reports/pytest/pytest_results.xml"
+  ],
+  "action_items": [
+    "CRITICAL: stop leaking underlying_allocation_pct / underlying_quantity. Sanitize the disclosure object in _hydrate_post (keep only ticker, disclosed_allocation_pct, disclosed_range, show_* flags, snapshot_at) and make /users/{u}/disclosures respect show_allocation and allocation_mode ('hidden' posts must not contribute a number).",
+    "Decide the intended semantics of the public 'Portföy Özeti' bar: if it must stay privacy-preserving it should aggregate last_disclosed values, not the live current allocation (today it republishes every portfolio change automatically).",
+    "Fix the ASTOR demo narrative: seed the ASTOR trim sell (or reword the post) so the '4,20 published vs 8,05 current' card no longer reads '↑ Artırdı' under text saying the position was halved.",
+    "GET /api/ should report the real provider name instead of the hardcoded 'demo'.",
+    "Remove the duplicated @api.get('/notifications') decorator.",
+    "Debounce InstrumentPicker's search (currently 1 XHR per keystroke) and add keyboard navigation/aria roles."
+  ],
+  "critical_code_review_comments": [
+    "server.py::_hydrate_post spreads the stored post ({**post}) straight into the API response, so any field added to the disclosure snapshot is automatically public. Privacy-sensitive documents must be serialised through an explicit response model, not spread.",
+    "server.py is 792 lines with auth, portfolio, market, social, uploads, notifications and alerts in one module — split into routers.",
+    "Profile.js embeds a ~45-line IIFE for the allocation bar inside JSX; extract into an <AllocationBar/> component (also makes the disclosed-vs-current decision explicit).",
+    "Portfolio.js: the dividend section is another large inline IIFE and the file has two blocks labelled '{/* Transactions */}'; the dividend aggregation should be computed by the backend (it already knows h.dividends) instead of re-deriving from the raw tx list on the client.",
+    "InstrumentPicker fetches /market/tickers on every keystroke and again for the selected value; no debounce, no abort of in-flight requests (only an `alive` guard), and no error state if the request fails (dropdown silently shows 'sonuç bulunamadı')."
+  ],
+  "updated_files": [
+    "/app/backend/tests/test_iteration3.py",
+    "/app/backend/tests/test_privacy_probe.py",
+    "/app/backend/tests/conftest.py"
+  ],
+  "success_rate": {"backend": "98% (49/50 — the single failure is the confirmed privacy leak)", "frontend": "100% of the requested flows (instrument search, buy, dividend, portfolio KPIs, public profile summary, compose disclosure picker, golden ASTOR/THYAO, auth+alerts+notifications regression)"},
+  "seed_data_creation": "No re-seed. Temporary data only: 2 transactions on Deniz (buy ASTOR 10@130, dividend ASTOR 500) via UI + a few via API — ALL deleted; verified Deniz is back to 12 txs / total_dividends 2900 / ASTOR 70 @ %8,05 / THYAO 18 @ %1,85 / cash 102.895. Throwaway users (TEST_priv_*, test_*) and 4 leftover 'TEST ...' posts on Deniz from the iteration-2 suite were purged; a new session-scoped autouse fixture in conftest.py now purges them automatically after every pytest run. Two orphan user rows from earlier iterations remain (t1786653145, eliferol) but have no posts/transactions.",
+  "should_call_test_agent_after_fix": true,
+  "should_main_agent_self_test": false,
+  "test_credentials": "deniz@divimero.com / demo1234, ece@divimero.com / demo1234, admin@divimero.com / admin123 (from /app/memory/test_credentials.md)",
+  "context_for_next_testing_agent": "Run `pytest /app/backend/tests/ -q` (pytest.ini sets -n 2 --dist loadscope; conftest now auto-purges TEST posts/users at session end). test_iteration3.py covers instrument search (ASTOR/case-insensitive/name/limit/quote), dividend create+delete+quantity invariance, buy normalisation, privacy (401 without token, no monetary fields in /disclosures), golden ASTOR (8.4 & 4.2) + THYAO (6.18 & 2.6), auth cookie HttpOnly, bcrypt $2b$ prefix, alerts CRUD, notifications. Golden DB values: Deniz 12 txs, dividends 2900 (GARAN 1650 + ASTOR 1250), ASTOR 70 sh %8,05, THYAO 18 sh %1,85, XIRR ~0,448. Prices are LIVE Yahoo, so allocation %s drift a little day to day — assert with tolerance. test_privacy_probe.py must go GREEN once the disclosure sanitisation is implemented.",
+  "rca_of_the_issue": "Privacy leak RCA: _snapshot_disclosure() stores both the real values (underlying_allocation_pct, underlying_quantity) and the user-consented values (disclosed_allocation_pct, disclosed_range) in the same embedded document. _hydrate_post then returns the post document verbatim ({**post}), and user_disclosures() reads d['underlying_allocation_pct'] unconditionally. Consequently the privacy switches in Compose (switch-alloc, alloc-mode='hidden', switch-qty, switch-value) are enforced only in the React renderer, not by the API: a curl against /api/feed or /api/users/{u}/disclosures returns the exact private allocation (and quantity when recorded) for every disclosed post. Verified with a throwaway account that published show_allocation=false/allocation_mode='hidden' — /disclosures returned allocation_at_publication=27.7399. Not fixed here (business logic); the failing test is left in place as the regression guard."
+}

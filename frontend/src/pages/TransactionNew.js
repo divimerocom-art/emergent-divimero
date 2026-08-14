@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { api } from "@/lib/api";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
+import InstrumentPicker from "@/components/InstrumentPicker";
 
 const TYPES = [
   { v:"buy", l:"Alım" }, { v:"sell", l:"Satım" },
@@ -16,12 +17,10 @@ const TYPES = [
 
 export default function TransactionNew() {
   const nav = useNavigate();
-  const [tickers, setTickers] = useState([]);
   const [f, setF] = useState({
     type: "buy", ticker: "", quantity: "", price: "", fees: "0", amount: "",
     date: new Date().toISOString().slice(0,10), note: "",
   });
-  useEffect(() => { api.get("/market/tickers").then(r => setTickers(r.data)); }, []);
 
   const upd = (k, v) => setF((x) => ({ ...x, [k]: v }));
   const needsTicker = ["buy","sell","dividend"].includes(f.type);
@@ -30,6 +29,7 @@ export default function TransactionNew() {
 
   const submit = async (e) => {
     e.preventDefault();
+    if (needsTicker && !f.ticker) { toast.error("Lütfen bir hisse seçin"); return; }
     const payload = {
       type: f.type,
       ticker: needsTicker ? f.ticker : null,
@@ -47,6 +47,14 @@ export default function TransactionNew() {
     } catch (e) { toast.error(e.response?.data?.detail || "Kaydedilemedi"); }
   };
 
+  const typeHint = {
+    buy: "Alım işlemi hisse adedini ve maliyeti artırır, nakiti azaltır.",
+    sell: "Satım işlemi hisse adedini azaltır, gerçekleşen K/Z'yi günceller.",
+    dividend: "Temettü hisse adedini değiştirmez; nakiti ve toplam temettü gelirini artırır.",
+    deposit: "Portföye nakit yatırma — 'Net Yatırım' toplamını artırır.",
+    withdraw: "Portföyden nakit çekme.",
+  }[f.type];
+
   return (
     <div className="max-w-xl mx-auto">
       <h1 className="font-heading text-2xl md:text-3xl font-bold tracking-tight">Yeni işlem</h1>
@@ -59,15 +67,13 @@ export default function TransactionNew() {
             <SelectTrigger data-testid="tx-type" className="rounded-full"><SelectValue/></SelectTrigger>
             <SelectContent>{TYPES.map(t => <SelectItem key={t.v} value={t.v}>{t.l}</SelectItem>)}</SelectContent>
           </Select>
+          {typeHint && <p className="text-xs text-mute mt-1.5">{typeHint}</p>}
         </div>
 
         {needsTicker && (
           <div>
             <Label>Hisse</Label>
-            <Select value={f.ticker} onValueChange={(v)=>upd("ticker", v)}>
-              <SelectTrigger data-testid="tx-ticker" className="rounded-full"><SelectValue placeholder="Bir sembol seçin"/></SelectTrigger>
-              <SelectContent>{tickers.map(t => <SelectItem key={t.symbol} value={t.symbol}>{t.symbol} — {t.name}</SelectItem>)}</SelectContent>
-            </Select>
+            <InstrumentPicker value={f.ticker} onChange={(s)=>upd("ticker", s)} testIdPrefix="tx-inst" placeholder="Hisse ara: sembol veya şirket adı (örn. ASTOR)"/>
           </div>
         )}
 
@@ -79,11 +85,11 @@ export default function TransactionNew() {
         )}
 
         {needsAmount && (
-          <div><Label>Tutar (TRY)</Label><Input value={f.amount} onChange={(e)=>upd("amount", e.target.value)} type="number" step="any" min="0" required data-testid="tx-amount"/></div>
+          <div><Label>{f.type === "dividend" ? "Temettü Tutarı (TRY)" : "Tutar (TRY)"}</Label><Input value={f.amount} onChange={(e)=>upd("amount", e.target.value)} type="number" step="any" min="0" required data-testid="tx-amount"/></div>
         )}
 
         <div className="grid grid-cols-2 gap-3">
-          <div><Label>Tarih</Label><Input value={f.date} onChange={(e)=>upd("date", e.target.value)} type="date" required data-testid="tx-date"/></div>
+          <div><Label>{f.type === "dividend" ? "Ödeme Tarihi" : "Tarih"}</Label><Input value={f.date} onChange={(e)=>upd("date", e.target.value)} type="date" required data-testid="tx-date"/></div>
           {needsQty && <div><Label>Komisyon (opsiyonel)</Label><Input value={f.fees} onChange={(e)=>upd("fees", e.target.value)} type="number" step="any" min="0" data-testid="tx-fees"/></div>}
         </div>
 
