@@ -44,15 +44,18 @@ export default function Landing() {
           <p className="mt-5 text-lg text-mute max-w-xl">
             Divimero, BIST portföyünüzü takip etmenizi ve — istediğinizde — pozisyon oranınızı içeriklerinizle şeffaf biçimde paylaşmanızı sağlar.
           </p>
+          <p className="mt-2 text-sm text-mute/80 max-w-xl" data-testid="hero-en-summary">
+            Divimero lets Turkish investors track their BIST portfolio and — when they choose — share their position size transparently alongside their content.
+          </p>
           <div className="mt-7 flex flex-wrap gap-3">
-            <Button onClick={()=>nav("/register")} size="lg" className="rounded-full bg-brand hover:bg-brand/90 text-white h-12 px-6" data-testid="hero-register">
-              Hemen başla <ArrowRight size={18} className="ml-1"/>
-            </Button>
-            <Button onClick={()=>demo("deniz@divimero.com")} disabled={busy} size="lg" variant="outline" className="rounded-full h-12 px-6 border-line" data-testid="hero-demo-deniz">
-              Demo: İçerik üreticisi (Deniz)
+            <Button onClick={()=>demo("deniz@divimero.com")} disabled={busy} size="lg" className="rounded-full bg-brand hover:bg-brand/90 text-white h-12 px-6" data-testid="hero-demo-deniz">
+              Demoyu incele — kayıt gerekmez <ArrowRight size={18} className="ml-1"/>
             </Button>
             <Button onClick={()=>demo("ece@divimero.com")} disabled={busy} size="lg" variant="outline" className="rounded-full h-12 px-6 border-line" data-testid="hero-demo-ece">
-              Demo: Takipçi (Ece)
+              Takipçi demosu — kayıt gerekmez
+            </Button>
+            <Button onClick={()=>nav("/register")} size="lg" variant="outline" className="rounded-full h-12 px-6 border-line" data-testid="hero-register">
+              Hemen başla
             </Button>
           </div>
           <p className="mt-4 text-xs text-mute">Piyasa fiyatları demo amaçlı, açıkça etiketlenmiştir. Yatırım tavsiyesi değildir.</p>
