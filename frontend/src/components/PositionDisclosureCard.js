@@ -1,4 +1,4 @@
-import { ArrowDown, ArrowUp, ArrowRight, Lock, Equal, CircleSlash } from "lucide-react";
+import { ArrowDown, ArrowUp, ArrowRight, Lock, Equal, CircleSlash, Info } from "lucide-react";
 import { pct, positionShare } from "@/lib/api";
 
 /**
@@ -69,7 +69,7 @@ export default function PositionDisclosureCard({ disclosure, current }) {
 
       {status && (
         <div className="mt-3 flex items-center gap-2 flex-wrap">
-          <span className="text-[11px] uppercase tracking-wider text-mute font-medium">Yayından bu yana</span>
+          <span className="text-[11px] uppercase tracking-wider text-mute font-medium">Yayından bu yana alım-satım</span>
           <span className={`inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-full ${status.bg} ${status.color}`} data-testid="disclosure-status">
             <status.icon size={14} /> {status.label}
             {magnitude != null && (
@@ -80,7 +80,13 @@ export default function PositionDisclosureCard({ disclosure, current }) {
       )}
 
       {driftOnly && (
-        <p className="mt-2 text-[11px] text-mute leading-snug" data-testid="disclosure-drift-note">
+        // This sentence is the proof the badge is trade-based, so it gets chip weight
+        // rather than fine print — as 11px muted text it read as a disclaimer, not evidence.
+        <p
+          className="mt-2.5 inline-flex items-start gap-1.5 text-xs text-ink bg-white border border-line rounded-lg px-2.5 py-1.5 leading-snug"
+          data-testid="disclosure-drift-note"
+        >
+          <Info size={13} className="mt-0.5 shrink-0 text-brand" aria-hidden="true" />
           Adet değişmedi — orandaki fark fiyat hareketinden.
         </p>
       )}
