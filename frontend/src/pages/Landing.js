@@ -45,7 +45,7 @@ export default function Landing() {
             Bir yatırımcı bir hisseyi övdüğünde gerçekten tutuyor mu, portföyünün ne kadarı, sonra sessizce azalttı mı?
             Divimero her tezi yayınlandığı andaki portföy oranına bağlar ve pozisyon değiştiğinde takipçiye gösterir.
           </p>
-          <p className="mt-2 text-sm text-mute/80 max-w-xl hidden md:block" data-testid="hero-en-summary">
+          <p className="mt-2 text-sm text-mute max-w-xl block" data-testid="hero-en-summary">
             Divimero lets Turkish investors track their BIST portfolio and — when they choose — share their position size transparently alongside their content.
           </p>
           <div className="mt-7 flex flex-wrap items-center gap-3">
@@ -83,7 +83,7 @@ export default function Landing() {
               </div>
             </div>
             <div className="mt-3 flex items-center gap-2 flex-wrap">
-              <span className="text-[11px] uppercase tracking-wider text-mute font-medium">Yayından bu yana</span>
+              <span className="text-[11px] uppercase tracking-wider text-mute font-medium">Yayından bu yana alım-satım</span>
               <span className="inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-full bg-orangeSoft text-neg">
                 <ArrowDown size={14}/> Azalttı <span className="font-medium">· pozisyonun ~%53'ü</span>
               </span>
@@ -100,6 +100,55 @@ export default function Landing() {
           </div>
         </div>
       </section>
+
+      {/* Why this matters. Every figure carries its source on screen — on a product about
+          unverified claims, an uncited number would undercut the whole premise. */}
+      <section className="max-w-6xl mx-auto px-6 pt-12 md:pt-20 pb-12 md:pb-20" aria-labelledby="impact-heading">
+        <h2 id="impact-heading" className="font-heading text-2xl md:text-3xl font-bold tracking-tight">
+          Neden önemli?
+        </h2>
+        <div className="mt-5 grid md:grid-cols-3 gap-4">
+          <Fact
+            figure="6.906.417"
+            text="Borsa İstanbul'da pay senedi bakiyesi bulunan yatırımcı sayısı (31 Temmuz 2026)."
+            source="MKK Sistem İstatistikleri, satır 3.1"
+            href="https://www.mkk.com.tr/sites/default/files/2026-08/MKK_SYSTEM_STATISTICS_JULY.pdf"
+          />
+          <Fact
+            text="SPK, sosyal medya hesabından pay piyasasına yönelik paylaşım yapıp aynı anda o payda işlem gerçekleştiren kişilere idari para cezası uyguluyor; ilgili içeriklerin kaldırılması için Erişim Sağlayıcıları Birliği'ne bildirimde bulunuyor."
+            source="SPK Bülteni 2026/34, 04.06.2026, Bölüm C.1"
+            href="https://spk.gov.tr/data/6a21eb938f95db12a4589b32/2026-34.pdf"
+          />
+          <Fact
+            text={'Kurul, finansal içerik üreticilerine dair "Finfluencer mı, Fraudencer mı?" adlı bir farkındalık programı yürütüyor.'}
+            source="SPK, 12.03.2026"
+            href="https://spk.gov.tr/duyurular/baskanin-konusmalari/2026/paradan-degere-finansal-okuryazarligin-donusturucu-gucu-etkinligi"
+          />
+        </div>
+        <p className="mt-5 text-sm text-mute max-w-3xl">
+          Divimero bu boşluğu kapatmaz, görünür kılar: bir tez yayınlandığında portföy oranı o an
+          dondurulur ve sonrasında pozisyonun gerçekten değişip değişmediği takipçiye gösterilir.
+        </p>
+      </section>
+    </div>
+  );
+}
+
+function Fact({ figure, text, source, href }) {
+  return (
+    <div className="rounded-2xl border border-line bg-surface p-5 flex flex-col">
+      {figure && (
+        <div className="font-heading text-3xl md:text-4xl font-bold tracking-tight tabular text-ink">{figure}</div>
+      )}
+      <p className={`${figure ? "mt-2" : ""} text-sm text-ink leading-snug flex-1`}>{text}</p>
+      <a
+        href={href}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="mt-3 text-xs text-mute underline underline-offset-4 hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand rounded"
+      >
+        Kaynak: {source}
+      </a>
     </div>
   );
 }
