@@ -14,6 +14,26 @@ states, because each one is derived from the ledger rather than declared:
 Deniz's ledger and his four disclosures are load-bearing: they are the W2
 regression evidence and his portfolio totals are pinned in HANDOFF.md §5.
 Change Mert's data, not his.
+
+IDEMPOTENCY CONTRACT — this runs on EVERY boot, against a LIVE database.
+
+A deployment preserves the production database, so this module cannot assume an
+empty collection and must never wipe one: real users may already have signed up.
+Every write below is therefore keyed deterministically and safe to repeat:
+
+  users          email
+  transactions   owner + type + date + ticker + size
+  posts          author + created_at        (text/disclosure never rewritten)
+  follows        follower + followee
+  likes          post + user
+  comments       post + user + text
+  alerts         user + followee + ticker
+  notifications  user + kind + actor + created_at
+
+Consequences to preserve if you edit this file: a second run creates no
+duplicates; an older database (7 posts / 4 disclosures) converges to the current
+one (9 / 6) without losing anything; and no document this module did not create
+is ever touched. Publication snapshots stay immutable on rerun by design.
 """
 from __future__ import annotations
 import os, uuid
@@ -42,13 +62,29 @@ async def _upsert_user(db, email, username, name, bio, password, avatar):
     return uid
 
 async def _add_tx(db, user_id, ttype, date, ticker=None, qty=0, price=0, fees=0, amount=0, note=""):
+    """Idempotent. A demo transaction is identified by owner + type + date + instrument + size."""
+    key = {"user_id": user_id, "type": ttype, "date": date,
+           "ticker": (ticker or None), "quantity": qty, "amount": amount}
+    if await db.transactions.find_one(key):
+        return
     await db.transactions.insert_one({
-        "id": _id(), "user_id": user_id, "type": ttype, "ticker": (ticker or None),
-        "date": date, "quantity": qty, "price": price, "fees": fees, "amount": amount,
+        "id": _id(), **key, "price": price, "fees": fees,
         "note": note, "created_at": _iso(),
     })
 
 async def _add_post(db, author_id, text, tickers=None, image_url=None, disclosure=None, created_at=None):
+    """Idempotent. A demo post is identified by author + publication timestamp.
+
+    On an existing post ONLY `image_url` is synced. `text` and `disclosure` are left alone:
+    the publication snapshot (disclosed_allocation_pct, snapshot_at) is immutable by contract,
+    and rewriting it on every boot would break that guarantee.
+    """
+    if created_at:
+        existing = await db.posts.find_one({"author_id": author_id, "created_at": created_at})
+        if existing:
+            if existing.get("image_url") != image_url:
+                await db.posts.update_one({"id": existing["id"]}, {"$set": {"image_url": image_url}})
+            return existing["id"]
     pid = _id()
     await db.posts.insert_one({
         "id": pid, "author_id": author_id, "text": text,
@@ -90,9 +126,11 @@ async def seed_all(db):
         })
 
     demo_pw = os.environ.get("DEMO_PASSWORD", "demo1234")
-    # If deniz already exists we assume seeding has been done — skip
-    if await db.users.find_one({"email": "deniz@divimero.com"}):
-        return
+    # No early return. Every write below is idempotent and keyed deterministically, so this
+    # runs on a fresh database AND on a redeployed one that already holds the earlier demo
+    # (7 posts / 4 disclosures), converging both to the same state without dropping anything.
+    # Deployments preserve the production database, so a wipe-and-reseed is not an option:
+    # it would destroy real users. Nothing here touches a document it did not create.
 
     deniz = await _upsert_user(db, "deniz@divimero.com", "deniz.yatirim", "Deniz Aksoy",
                                 "BIST hisseleri üzerine uzun vadeli yatırım tezleri. Şeffaflık her şeydir.",
@@ -210,10 +248,10 @@ async def seed_all(db):
     await _add_tx(db, mert, "sell", "2025-09-05T10:00:00+00:00", ticker="AKBNK", qty=360, price=74.30, fees=35, note="AKBNK kısmi realizasyon")
 
     # Ece follows Deniz + likes & comments the thyao post
-    await db.follows.insert_one({"id": _id(), "follower_id": ece, "followee_id": deniz, "created_at": _iso()})
-    await db.follows.insert_one({"id": _id(), "follower_id": ece, "followee_id": mert, "created_at": _iso()})
-    await db.follows.insert_one({"id": _id(), "follower_id": mert, "followee_id": deniz, "created_at": _iso()})
-    await db.follows.insert_one({"id": _id(), "follower_id": zeynep, "followee_id": deniz, "created_at": _iso()})
+    for follower, followee in [(ece, deniz), (ece, mert), (mert, deniz), (zeynep, deniz)]:
+        await db.follows.update_one(
+            {"follower_id": follower, "followee_id": followee},
+            {"$setOnInsert": {"id": _id(), "created_at": _iso()}}, upsert=True)
 
     # Engagement, dated between each post and now — seed-time timestamps made a
     # 2025 post show comments as "az önce".
@@ -235,7 +273,10 @@ async def seed_all(db):
         (akbnk_post, ece, "2025-09-02T16:05:00+00:00"),
         (akbnk_post, zeynep, "2025-09-03T09:00:00+00:00"),
     ]:
-        await db.likes.insert_one({"post_id": pid, "user_id": uid, "created_at": when})
+        # $set on created_at also repairs the original seed's "now" timestamps, which made a
+        # 2025 post render its engagement as "az önce".
+        await db.likes.update_one({"post_id": pid, "user_id": uid},
+                                  {"$set": {"created_at": when}}, upsert=True)
 
     for pid, uid, text, when in [
         (thyao_post, ece, "Pozisyon oranı paylaşımı için teşekkürler, çok değerli.", "2025-08-13T11:22:00+00:00"),
@@ -245,23 +286,27 @@ async def seed_all(db):
         (akbnk_post, deniz, "Temettü verimi tarafında haklısın. Oranı paylaşman tezi daha okunur kılıyor.", "2025-09-02T10:45:00+00:00"),
         (eregl_post, ece, "Çelik marjları için takipteyim, pozisyonunu izliyorum.", "2025-09-01T08:25:00+00:00"),
     ]:
-        await db.comments.insert_one({"id": _id(), "post_id": pid, "user_id": uid, "text": text, "created_at": when})
+        await db.comments.update_one({"post_id": pid, "user_id": uid, "text": text},
+                                     {"$set": {"created_at": when},
+                                      "$setOnInsert": {"id": _id()}}, upsert=True)
 
     # 6. The "follow position changes" payoff needs an artifact. Ece watches Deniz's THYAO;
     # the alert already fired when he trimmed it, so /alerts is a live row and the bell has
     # an unread badge on the follower demo instead of two empty states.
-    await db.alerts.insert_one({
-        "id": _id(), "user_id": ece, "followee_id": deniz, "ticker": "THYAO",
-        "direction": "decrease", "threshold_pct": 1.0, "active": True,
-        "created_at": "2025-08-14T09:00:00+00:00",
-    })
-    await db.notifications.insert_one({
-        "id": _id(), "user_id": ece, "kind": "alert", "actor_id": deniz, "post_id": None,
-        "ticker": "THYAO", "before_pct": 6.18, "after_pct": 2.6, "delta_pct": -3.58,
-        "change_kind": "azalttı", "created_at": "2025-08-26T09:05:00+00:00", "read": False,
-    })
-    await db.notifications.insert_one({
-        "id": _id(), "user_id": ece, "kind": "new_post", "actor_id": deniz,
-        "post_id": astor_trim_post, "has_disclosure": True,
-        "created_at": "2025-08-29T09:01:00+00:00", "read": False,
-    })
+    await db.alerts.update_one(
+        {"user_id": ece, "followee_id": deniz, "ticker": "THYAO"},
+        {"$set": {"direction": "decrease", "threshold_pct": 1.0, "active": True},
+         "$setOnInsert": {"id": _id(), "created_at": "2025-08-14T09:00:00+00:00"}}, upsert=True)
+    # `read` is deliberately $setOnInsert: if a judge has already opened the bell on a live
+    # deployment, a redeploy must not silently mark their notifications unread again.
+    await db.notifications.update_one(
+        {"user_id": ece, "kind": "alert", "actor_id": deniz, "ticker": "THYAO",
+         "created_at": "2025-08-26T09:05:00+00:00"},
+        {"$set": {"post_id": None, "before_pct": 6.18, "after_pct": 2.6,
+                  "delta_pct": -3.58, "change_kind": "azalttı"},
+         "$setOnInsert": {"id": _id(), "read": False}}, upsert=True)
+    await db.notifications.update_one(
+        {"user_id": ece, "kind": "new_post", "actor_id": deniz,
+         "created_at": "2025-08-29T09:01:00+00:00"},
+        {"$set": {"post_id": astor_trim_post, "has_disclosure": True},
+         "$setOnInsert": {"id": _id(), "read": False}}, upsert=True)
