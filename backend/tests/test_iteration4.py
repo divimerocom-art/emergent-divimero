@@ -50,7 +50,7 @@ class TestFeedPrivacy:
             assert set(d.keys()) <= {
                 "ticker", "disclosed_allocation_pct", "disclosed_range", "show_allocation",
                 "allocation_mode", "show_quantity", "show_value", "source", "snapshot_at",
-                "change_status"}, d.keys()
+                "change_status", "change_magnitude_pct"}, d.keys()
             assert d.get("change_status") in {"increased", "reduced", "closed", "unchanged", None}
             cp = p.get("current_position")
             assert cp is None or set(cp.keys()) == {"allocation_pct"}, cp
@@ -79,7 +79,11 @@ class TestGoldenDisclosures:
             assert k not in raw, f"LEAK: {k} in /disclosures"
         assert "THYAO" in rows and "ASTOR" in rows, rows.keys()
         assert rows["THYAO"]["last_disclosed"] == pytest.approx(2.6, abs=0.01)
-        assert rows["THYAO"]["change_status"] == "reduced", rows["THYAO"]
+        # The badge compares share counts against the LAST disclosure (26.08.2025),
+        # by which date the 25.08 sale had already happened: 18 shares then, 18 now.
+        # This asserted "reduced" while the status was derived from allocation %,
+        # which drifts with the share price even when the creator makes no trade.
+        assert rows["THYAO"]["change_status"] == "unchanged", rows["THYAO"]
         assert rows["ASTOR"]["last_disclosed"] == pytest.approx(4.2, abs=0.01), rows["ASTOR"]
         for row in rows.values():
             assert set(row["current"].keys()) == {"allocation_pct"}, row["current"]

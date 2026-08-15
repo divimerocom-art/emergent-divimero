@@ -1,5 +1,5 @@
 import { ArrowDown, ArrowUp, Lock, Minus, Circle } from "lucide-react";
-import { pct } from "@/lib/api";
+import { pct, positionShare } from "@/lib/api";
 
 /**
  * The HERO component: shows publication-time allocation vs current allocation.
@@ -23,6 +23,10 @@ export default function PositionDisclosureCard({ disclosure, current }) {
       default:          return null;
     }
   })();
+
+  // Relative size of the move, e.g. "pozisyonun ~%50'si". Only present for
+  // increased/reduced — "Kapatıldı" and "Değişmedi" are already unambiguous.
+  const magnitude = disclosure.change_magnitude_pct ?? null;
 
   return (
     <div className="rounded-2xl border border-line bg-surface p-4 md:p-5" data-testid="position-disclosure-card">
@@ -51,15 +55,18 @@ export default function PositionDisclosureCard({ disclosure, current }) {
         </div>
       </div>
 
-      {status && (
-        <div className="mt-3 flex items-center gap-2">
+      <div className="mt-3 flex items-center gap-2 flex-wrap">
+        {status && (
           <span className={`inline-flex items-center gap-1 text-xs font-semibold px-2.5 py-1 rounded-full ${status.bg} ${status.color}`} data-testid="disclosure-status">
             <status.icon size={14} /> {status.label}
           </span>
-          {disclosure.show_quantity === false && <span className="text-[11px] text-mute">Adet gizli</span>}
-          {disclosure.show_value === false && <span className="text-[11px] text-mute">Tutar gizli</span>}
-        </div>
-      )}
+        )}
+        {magnitude != null && (
+          <span className="text-[11px] text-mute" data-testid="disclosure-magnitude">· {positionShare(magnitude)}</span>
+        )}
+        {disclosure.show_quantity === false && <span className="text-[11px] text-mute">Adet gizli</span>}
+        {disclosure.show_value === false && <span className="text-[11px] text-mute">Tutar gizli</span>}
+      </div>
     </div>
   );
 }

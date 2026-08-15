@@ -101,23 +101,39 @@ def test_feed_post_divergence_gone():
     assert not mismatches, "DIVERGENCE: " + "; ".join(mismatches)
 
 
-def test_thyao_reduced_and_astor_status():
+def test_seeded_disclosure_badges_are_trade_based():
+    """Each seeded disclosure, keyed by the date it was published.
+
+    The badge must describe what the creator DID between publication and now, so
+    these values are fixed by the transaction ledger and do not move with BIST
+    prices. Both 'unchanged' cases are posts published AFTER the corresponding
+    sale had already settled — the creator has not traded the name since.
+    """
+    expected = {
+        ("THYAO", "2025-08-13"): ("reduced", 53),    # 38 -> 18 shares
+        ("ASTOR", "2025-08-15"): ("reduced", 50),    # 140 -> 70 shares
+        ("THYAO", "2025-08-26"): ("unchanged", None),  # 18 -> 18, sold on 25.08
+        ("ASTOR", "2025-08-29"): ("unchanged", None),  # 70 -> 70, trimmed on 28.08
+    }
     feed = requests.get(f"{API}/feed", timeout=60).json()
     seen = {}
     for p in feed:
         d = p.get("disclosure")
-        if not d:
+        if not d or not d.get("snapshot_at"):
             continue
-        seen.setdefault(d.get("ticker"), []).append(
-            (d.get("change_status"), (p.get("current_position") or {}).get("allocation_pct"))
+        seen[(d["ticker"], d["snapshot_at"][:10])] = (
+            d.get("change_status"), d.get("change_magnitude_pct")
         )
-    print("disclosure statuses:", seen)
-    assert "THYAO" in seen, "no THYAO disclosure post seeded"
-    for status, alloc in seen["THYAO"]:
-        assert status == "reduced", f"THYAO expected 'reduced', got {status} (alloc={alloc})"
-    if "ASTOR" in seen:
-        for status, alloc in seen["ASTOR"]:
-            assert status in ("unchanged", "increased", "reduced"), status
+    print("disclosure badges:", seen)
+    for key, want in expected.items():
+        assert key in seen, f"{key} disclosure post missing from feed; got {sorted(seen)}"
+        assert seen[key] == want, f"{key}: expected {want}, got {seen[key]}"
+
+    # Allocation percentage is still published as valuation context, unchanged.
+    for p in feed:
+        d = p.get("disclosure")
+        if d and d.get("ticker") == "ASTOR":
+            alloc = (p.get("current_position") or {}).get("allocation_pct")
             assert alloc is not None and alloc < 15, f"ASTOR alloc looks inflated: {alloc}"
 
 

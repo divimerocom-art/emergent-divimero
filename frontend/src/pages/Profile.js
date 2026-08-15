@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { api, pct, relTime } from "@/lib/api";
+import { api, pct, relTime, positionShare } from "@/lib/api";
 import FeedCard from "@/components/FeedCard";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -135,7 +135,10 @@ export default function Profile() {
                     {last != null && <> · Son beyan: <b className="text-ink tabular">{pct(last)}</b></>}
                   </div>
                   {last != null && <div className="tabular font-medium">Güncel {pct(cur)}</div>}
-                  {status && <span className={`text-xs font-semibold ${c}`}>{trend}</span>}
+                  {status && <span className={`text-xs font-semibold ${c}`} data-testid={`disc-status-${d.ticker}`}>{trend}</span>}
+                  {d.change_magnitude_pct != null && (
+                    <span className="text-[11px] text-mute">· {positionShare(d.change_magnitude_pct)}</span>
+                  )}
                 </li>
               );
             })}

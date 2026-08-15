@@ -458,8 +458,9 @@ async def create_post(payload: PostIn, user=Depends(get_current_user)):
         await db.notifications.insert_many(notif_docs)
     return await _hydrate_post(post, viewer_id=user["id"])
 
-async def _current_allocation(author_id: str, ticker: str) -> dict:
-    txs = await _user_txs(author_id)
+async def _current_allocation(author_id: str, ticker: str, txs: Optional[list] = None) -> dict:
+    if txs is None:
+        txs = await _user_txs(author_id)
     provider = get_market_data_provider()
     all_syms = list({(t.get("ticker") or "").upper() for t in txs if t.get("ticker")})
     quotes = {s: q.price for s, q in provider.get_quotes(all_syms).items()}
@@ -487,30 +488,43 @@ def _sanitize_disclosure(d: Optional[dict]) -> Optional[dict]:
     }
 
 
-def _change_status(underlying_pub: Optional[float], current_pct: Optional[float]) -> Optional[str]:
-    """DEPRECATED — allocation-pct based classifier. Kept only for the seed's
-    snapshot back-fill so nothing else breaks. Actual feed/post change_status
-    now comes from _qty_change (share-count based)."""
-    if underlying_pub is None or current_pct is None:
+def _ts(value: Optional[str]) -> Optional[datetime]:
+    """Parse an ISO timestamp into an aware UTC datetime.
+
+    The ledger carries three shapes in practice: '…+00:00' (seed and now_iso),
+    '…Z' with milliseconds (browser toISOString), and bare 'YYYY-MM-DD' (tests).
+    Comparing those as raw strings is wrong — '.'/'Z'/'+' order by byte value,
+    not by instant. Returns None when missing or unparseable.
+    """
+    if not value:
         return None
-    if current_pct <= 0.05:
-        return "closed"
-    diff = current_pct - underlying_pub
-    if abs(diff) < 0.1:
-        return "unchanged"
-    return "increased" if diff > 0 else "reduced"
+    s = value.strip()
+    if s.endswith("Z"):
+        s = s[:-1] + "+00:00"
+    try:
+        dt = datetime.fromisoformat(s)
+    except ValueError:
+        return None
+    return dt if dt.tzinfo else dt.replace(tzinfo=timezone.utc)
 
 
-def _qty_at(sorted_txs: List[dict], ticker: str, cutoff_iso: Optional[str]) -> float:
-    """Walk the ticker's ledger up to `cutoff_iso` inclusive and return net qty.
-    Dividends don't affect qty. Deposits/withdraws are cash-only."""
+def _qty_at(txs: List[dict], ticker: str, cutoff_iso: Optional[str]) -> float:
+    """Net share count for `ticker` over the ledger, up to `cutoff_iso` inclusive.
+
+    Dividends don't affect qty; deposits/withdraws are cash-only. Order-independent:
+    every row is inspected, so an unsorted ledger yields the same answer.
+    """
     q = 0.0
     sym = (ticker or "").upper()
-    for t in sorted_txs:
-        if cutoff_iso and (t.get("date") or "") > cutoff_iso:
-            break
+    cutoff = _ts(cutoff_iso)
+    for t in txs:
         if (t.get("ticker") or "").upper() != sym:
             continue
+        if cutoff is not None:
+            when = _ts(t.get("date"))
+            # An undatable row cannot be proven to precede publication — exclude it.
+            if when is None or when > cutoff:
+                continue
         ttype = (t.get("type") or "").lower()
         n = float(t.get("quantity") or 0)
         if ttype == "buy":
@@ -520,21 +534,33 @@ def _qty_at(sorted_txs: List[dict], ticker: str, cutoff_iso: Optional[str]) -> f
     return max(0.0, q)
 
 
-def _qty_change(sorted_txs: List[dict], ticker: str, snapshot_at: Optional[str]) -> tuple[Optional[str], Optional[float]]:
-    """Return (change_status, change_ratio) based purely on share count.
-    change_ratio = (qty_now - qty_at_pub) / qty_at_pub  (None when qty_at_pub == 0).
-    change_status ∈ {increased, reduced, unchanged, closed}."""
-    qty_now = _qty_at(sorted_txs, ticker, None)
-    qty_pub = _qty_at(sorted_txs, ticker, snapshot_at)
+def _qty_change(txs: List[dict], ticker: str, snapshot_at: Optional[str]) -> tuple[Optional[str], Optional[int]]:
+    """THE shared disclosure classifier — feed, post detail and profile all use this.
+
+    Compares the share count held at publication against the share count held now,
+    so the badge reflects what the creator actually DID. Allocation percentage is
+    price-driven and must never decide this.
+
+    Returns (change_status, change_magnitude_pct):
+      change_status ∈ {increased, reduced, closed, unchanged}, or None when the
+      author held nothing at publication (no meaningful baseline to compare against).
+      change_magnitude_pct is the size of the move relative to the position at
+      publication, as a whole percent — set only for increased/reduced ('closed'
+      is already unambiguous). It is deliberately rounded: the exact quotient is
+      reversible into share counts via its smallest denominator, which would leak
+      the position size that show_quantity=False exists to withhold.
+    """
+    qty_now = _qty_at(txs, ticker, None)
+    qty_pub = _qty_at(txs, ticker, snapshot_at)
     if qty_pub <= 1e-9:
         return (None, None)
     if qty_now <= 1e-9:
-        return ("closed", -1.0)
+        return ("closed", None)
     diff = qty_now - qty_pub
     if abs(diff) < 1e-9:
-        return ("unchanged", 0.0)
-    ratio = diff / qty_pub
-    return (("increased" if diff > 0 else "reduced"), ratio)
+        return ("unchanged", None)
+    magnitude = round(abs(diff) / qty_pub * 100)
+    return (("increased" if diff > 0 else "reduced"), magnitude)
 
 
 async def _hydrate_post(post: dict, viewer_id: Optional[str]) -> dict:
@@ -548,14 +574,17 @@ async def _hydrate_post(post: dict, viewer_id: Optional[str]) -> dict:
     disc_out = _sanitize_disclosure(raw_disc)
     current = None
     change_status = None
+    change_magnitude = None
     if raw_disc:
         # Compute current allocation only if the author actually disclosed the allocation.
         if raw_disc.get("show_allocation", True):
-            cur = await _current_allocation(post["author_id"], raw_disc["ticker"])
+            txs = await _user_txs(post["author_id"])
+            cur = await _current_allocation(post["author_id"], raw_disc["ticker"], txs)
             current = {"allocation_pct": cur["allocation_pct"]}  # never leak qty
-            change_status = _change_status(raw_disc.get("underlying_allocation_pct"), cur["allocation_pct"])
+            change_status, change_magnitude = _qty_change(txs, raw_disc["ticker"], raw_disc.get("snapshot_at"))
         if disc_out is not None:
             disc_out["change_status"] = change_status
+            disc_out["change_magnitude_pct"] = change_magnitude
     return {
         "id": post["id"],
         "author_id": post["author_id"],
@@ -633,14 +662,17 @@ async def feed(request: Request, limit: int = 30):
         disc_out = _sanitize_disclosure(raw_disc)
         current = None
         change_status = None
+        change_magnitude = None
         if raw_disc and raw_disc.get("show_allocation", True):
             cur_alloc = _current_for(p["author_id"], raw_disc["ticker"])
             if cur_alloc is not None:
                 cur_alloc = round(cur_alloc, 4)
                 current = {"allocation_pct": cur_alloc}
-                change_status = _change_status(raw_disc.get("underlying_allocation_pct"), cur_alloc)
+                change_status, change_magnitude = _qty_change(
+                    author_txs.get(p["author_id"]) or [], raw_disc["ticker"], raw_disc.get("snapshot_at"))
         if disc_out is not None:
             disc_out["change_status"] = change_status
+            disc_out["change_magnitude_pct"] = change_magnitude
         author = authors.get(p["author_id"])
         out.append({
             "id": p["id"], "author_id": p["author_id"], "text": p["text"],
@@ -725,6 +757,10 @@ async def user_disclosures(username: str):
             continue
         entry = by_ticker.setdefault(t, {"ticker": t, "history": [], "last_disclosed": None, "opened_at": p["created_at"]})
         entry["opened_at"] = min(entry["opened_at"], p["created_at"])
+        # Posts are fetched created_at-ascending, so the last write wins: this ends up
+        # holding the MOST RECENT disclosure's snapshot. That is the baseline the row
+        # compares against, matching the "Son beyan" figure rendered beside the badge.
+        entry["last_snapshot_at"] = d.get("snapshot_at")
         # Only add a numeric history point if the user disclosed a value in this post
         if d.get("show_allocation") and d.get("allocation_mode") in (None, "exact") and d.get("disclosed_allocation_pct") is not None:
             entry["history"].append({
@@ -738,10 +774,13 @@ async def user_disclosures(username: str):
                 "disclosed_range": d["disclosed_range"],
             })
     # attach current allocation + change_status only if the user has publicly disclosed a value at least once
+    txs = await _user_txs(u["id"])
     for t, entry in by_ticker.items():
-        cur = await _current_allocation(u["id"], t)
+        cur = await _current_allocation(u["id"], t, txs)
         entry["current"] = {"allocation_pct": cur["allocation_pct"]}  # never leak qty
-        entry["change_status"] = _change_status(entry.get("last_disclosed"), cur["allocation_pct"]) if entry.get("last_disclosed") is not None else None
+        status, magnitude = _qty_change(txs, t, entry.get("last_snapshot_at"))
+        entry["change_status"] = status if entry.get("last_disclosed") is not None else None
+        entry["change_magnitude_pct"] = magnitude if entry.get("last_disclosed") is not None else None
     return list(by_ticker.values())
 
 # --- Uploads (Emergent Object Storage) -------------------------------------

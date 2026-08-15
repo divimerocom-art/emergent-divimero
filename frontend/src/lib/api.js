@@ -26,6 +26,22 @@ export const money = (v, opts = {}) =>
 export const pct = (v) => `%${Number(v || 0).toLocaleString("tr-TR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 export const num = (v, d = 2) => Number(v || 0).toLocaleString("tr-TR", { minimumFractionDigits: d, maximumFractionDigits: d });
 
+// Turkish possessive suffix for a number, chosen by the last word of how it is read:
+// 50 "elli" -> 'si, 53 "elli üç" -> 'ü, 100 "yüz" -> 'ü, 1000 "bin" -> 'i.
+const ONES_SUFFIX = ["", "i", "si", "ü", "ü", "i", "sı", "si", "i", "u"];
+const TENS_SUFFIX = ["", "u", "si", "u", "ı", "si", "ı", "i", "i", "ı"];
+export function numSuffix(n) {
+  const v = Math.abs(Math.round(Number(n) || 0));
+  if (v % 10) return ONES_SUFFIX[v % 10];
+  if (v % 100) return TENS_SUFFIX[(v % 100) / 10];
+  if (v % 1000) return "ü";
+  return v ? "i" : "ı";
+}
+
+// Privacy-safe relative magnitude: a share of the position at publication, never a
+// quantity or a value. The backend already rounds it to a whole percent.
+export const positionShare = (n) => `pozisyonun ~%${n}'${numSuffix(n)}`;
+
 export function relTime(iso) {
   const t = new Date(iso).getTime();
   const diff = Math.max(0, Date.now() - t);
