@@ -27,7 +27,6 @@ def _hash(pw): return bcrypt.hashpw(pw.encode(), bcrypt.gensalt()).decode()
 DENIZ_AVATAR = "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA2ODl8MHwxfHNlYXJjaHwyfHxwcm9mZXNzaW9uYWwlMjBpbnZlc3RvciUyMHBvcnRyYWl0fGVufDB8fHx8MTc4NjY1MjI1NXww&ixlib=rb-4.1.0&q=85"
 ECE_AVATAR = "https://images.unsplash.com/photo-1560250097-0b93528c311a?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA2ODl8MHwxfHNlYXJjaHwxfHxwcm9mZXNzaW9uYWwlMjBpbnZlc3RvciUyMHBvcnRyYWl0fGVufDB8fHx8MTc4NjY1MjI1NXww&ixlib=rb-4.1.0&q=85"
 MERT_AVATAR = "https://images.pexels.com/photos/7567299/pexels-photo-7567299.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940"
-POST_IMG_1 = "https://images.unsplash.com/photo-1590283603385-17ffb3a7f29f?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NTY2NzB8MHwxfHNlYXJjaHwxfHxzdG9jayUyMG1hcmtldCUyMGNoYXJ0JTIwYWJzdHJhY3R8ZW58MHx8fHwxNzg2NjUyMjU1fDA&ixlib=rb-4.1.0&q=85"
 
 async def _upsert_user(db, email, username, name, bio, password, avatar):
     email = email.lower()
@@ -188,7 +187,7 @@ async def seed_all(db):
     # 5b. Mert is the second creator, and the one who demonstrates the two badge states
     # Deniz's ledger cannot reach. Deniz's transactions are deliberately left untouched:
     # his four disclosures are the W2 regression evidence and his portfolio totals are pinned.
-    await _add_tx(db, mert, "deposit", "2025-07-02T09:00:00+00:00", amount=150000, note="Başlangıç sermayesi")
+    await _add_tx(db, mert, "deposit", "2025-07-02T09:00:00+00:00", amount=300000, note="Başlangıç sermayesi")
     await _add_tx(db, mert, "buy", "2025-07-08T10:00:00+00:00", ticker="AKBNK", qty=900, price=61.50, fees=40, note="AKBNK alım")
     await _add_tx(db, mert, "buy", "2025-07-09T10:00:00+00:00", ticker="GARAN", qty=300, price=118.00, fees=30, note="GARAN alım")
     await _add_tx(db, mert, "buy", "2025-07-15T10:00:00+00:00", ticker="EREGL", qty=700, price=48.20, fees=30, note="EREGL alım")
@@ -241,7 +240,7 @@ async def seed_all(db):
     for pid, uid, text, when in [
         (thyao_post, ece, "Pozisyon oranı paylaşımı için teşekkürler, çok değerli.", "2025-08-13T11:22:00+00:00"),
         (thyao_post, mert, "Uzun mesafe fiyatlaması konusunda hemfikirim.", "2025-08-13T14:08:00+00:00"),
-        (astor_trim_post, ece, "Azalttığını rozetten değil, defterden gördüm — bu yüzden buradayım.", "2025-08-29T10:18:00+00:00"),
+        (astor_trim_post, ece, "Rozet \"Değişmedi\" diyor, yani beyandan sonra işlem yapmamışsın. Oranın artması beni yanıltmıyor artık.", "2025-08-29T10:18:00+00:00"),
         (astor_post, zeynep, "OSB elektrifikasyonu tezine katılıyorum, oranı görmek ayrıca güven veriyor.", "2025-08-16T09:30:00+00:00"),
         (akbnk_post, deniz, "Temettü verimi tarafında haklısın. Oranı paylaşman tezi daha okunur kılıyor.", "2025-09-02T10:45:00+00:00"),
         (eregl_post, ece, "Çelik marjları için takipteyim, pozisyonunu izliyorum.", "2025-09-01T08:25:00+00:00"),
@@ -253,7 +252,8 @@ async def seed_all(db):
     # an unread badge on the follower demo instead of two empty states.
     await db.alerts.insert_one({
         "id": _id(), "user_id": ece, "followee_id": deniz, "ticker": "THYAO",
-        "direction": "decrease", "threshold_pct": 1.0, "created_at": "2025-08-14T09:00:00+00:00",
+        "direction": "decrease", "threshold_pct": 1.0, "active": True,
+        "created_at": "2025-08-14T09:00:00+00:00",
     })
     await db.notifications.insert_one({
         "id": _id(), "user_id": ece, "kind": "alert", "actor_id": deniz, "post_id": None,
