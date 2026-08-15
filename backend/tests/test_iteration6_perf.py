@@ -112,8 +112,10 @@ class TestFeed:
                 if cp is None:
                     problems.append(f"{d['ticker']}: current_position is None")
                     continue
-                if not isinstance(cp.get("allocation_pct"), (int, float)) or cp["allocation_pct"] <= 0:
-                    problems.append(f"{d['ticker']}: allocation_pct={cp.get('allocation_pct')} not positive")
+                # A closed position is 0% by definition — that IS the "Kapattı" state.
+                floor = 0.0 if d.get("change_status") == "closed" else 0.000001
+                if not isinstance(cp.get("allocation_pct"), (int, float)) or cp["allocation_pct"] < floor:
+                    problems.append(f"{d['ticker']}: allocation_pct={cp.get('allocation_pct')} invalid for status {d.get('change_status')!r}")
                 if d.get("change_status") not in valid:
                     problems.append(f"{d['ticker']}: change_status={d.get('change_status')!r}")
                 assert "quantity" not in cp, "quantity leaked in current_position"
