@@ -10,7 +10,10 @@ module.exports = {
         surface: "#F1F5F7",
         line: "#E3E3E3",
         ink: "#171717",
-        mute: "#72777F",
+        // 5.36:1 on bg-surface (#F1F5F7), 5.88:1 on white. The previous #72777F
+        // measured 4.11:1 on bg-surface, below the WCAG AA 4.5:1 floor, and the
+        // disclosure card puts text-mute directly on bg-surface.
+        mute: "#5F656D",
         brand: {
           DEFAULT: "#35C7B2",
           soft: "#E1F4F1",
@@ -33,7 +36,7 @@ module.exports = {
         popover: { DEFAULT: "#FFFFFF", foreground: "#171717" },
         primary: { DEFAULT: "#35C7B2", foreground: "#FFFFFF" },
         secondary: { DEFAULT: "#F1F5F7", foreground: "#171717" },
-        muted: { DEFAULT: "#F1F5F7", foreground: "#72777F" },
+        muted: { DEFAULT: "#F1F5F7", foreground: "#5F656D" },
         accent: { DEFAULT: "#E6E2FD", foreground: "#7361F7" },
         destructive: { DEFAULT: "#FF3B30", foreground: "#FFFFFF" },
         border: "#E3E3E3",
