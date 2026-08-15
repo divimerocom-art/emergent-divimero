@@ -28,16 +28,25 @@ export default function NotificationsBell() {
 
   return (
     <div className="relative" ref={ref}>
-      <button onClick={toggle} className="relative p-2 rounded-full hover:bg-surface transition-colors" data-testid="notif-bell">
-        <Bell size={18} className="text-mute" />
+      {/* Icon-only control: the count is folded into the accessible name so the
+          button announces as "Bildirimler, 3 okunmamış" rather than unnamed. */}
+      <button
+        onClick={toggle}
+        className="relative p-2 rounded-full hover:bg-surface transition-colors"
+        aria-label={data.unread > 0 ? `Bildirimler, ${data.unread} okunmamış` : "Bildirimler"}
+        aria-expanded={open}
+        aria-controls="notif-panel"
+        data-testid="notif-bell"
+      >
+        <Bell size={18} className="text-mute" aria-hidden="true" />
         {data.unread > 0 && (
-          <span className="absolute -top-0.5 -right-0.5 h-4 min-w-[16px] px-1 rounded-full bg-neg text-white text-[10px] font-bold flex items-center justify-center tabular" data-testid="notif-badge">
+          <span aria-hidden="true" className="absolute -top-0.5 -right-0.5 h-4 min-w-[16px] px-1 rounded-full bg-neg text-white text-[10px] font-bold flex items-center justify-center tabular" data-testid="notif-badge">
             {data.unread > 9 ? "9+" : data.unread}
           </span>
         )}
       </button>
       {open && (
-        <div className="absolute right-0 mt-2 w-80 md:w-96 bg-white border border-line rounded-2xl shadow-sm overflow-hidden z-50" data-testid="notif-panel">
+        <div id="notif-panel" className="absolute right-0 mt-2 w-80 md:w-96 bg-white border border-line rounded-2xl shadow-sm overflow-hidden z-50" data-testid="notif-panel">
           <div className="px-4 py-3 border-b border-line font-heading font-semibold">Bildirimler</div>
           {data.items.length === 0 ? (
             <div className="p-6 text-sm text-mute text-center">Henüz bildirim yok.</div>

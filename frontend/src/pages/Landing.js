@@ -2,12 +2,18 @@ import { Link, useNavigate } from "react-router-dom";
 import { TrendingUp, ShieldCheck, Eye, ArrowRight, ArrowDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/context/AuthContext";
+import BrandLogo from "@/components/BrandLogo";
 import { useState } from "react";
 import { toast } from "sonner";
 
+// Real links rather than onClick buttons, so the nav landmark actually contains
+// links and middle-click / ctrl-click open a new tab as users expect.
+const pillCta =
+  "inline-flex items-center justify-center h-10 px-4 rounded-full bg-ink hover:bg-black text-white text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2";
+
 export default function Landing() {
   const nav = useNavigate();
-  const { login } = useAuth();
+  const { login, user, loading } = useAuth();
   const [busy, setBusy] = useState(false);
 
   const demo = async (email) => {
@@ -20,19 +26,34 @@ export default function Landing() {
 
   return (
     <div className="min-h-screen bg-white text-ink">
-      <header className="max-w-6xl mx-auto px-6 py-5 flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <div className="h-9 w-9 rounded-xl bg-brand-soft flex items-center justify-center">
-            <TrendingUp size={20} className="text-brand" strokeWidth={2}/>
-          </div>
-          <span className="font-heading text-xl font-bold tracking-tight">divimero</span>
-        </div>
-        <div className="flex items-center gap-3">
-          <Link to="/login" className="text-sm text-mute hover:text-ink" data-testid="link-login">Giriş</Link>
-          <Button onClick={()=>nav("/register")} className="rounded-full bg-ink hover:bg-black text-white" data-testid="cta-register">Ücretsiz üye ol</Button>
-        </div>
+      <a href="#main" className="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-50 focus:rounded-full focus:bg-ink focus:px-4 focus:py-2 focus:text-sm focus:text-white">
+        İçeriğe geç
+      </a>
+
+      <header className="max-w-6xl mx-auto px-6 py-5 flex items-center justify-between gap-4">
+        <BrandLogo testId="brand-home-landing" />
+        {/* Signed-in visitors land here too now, so the header offers the way
+            into the app rather than a second invitation to register.
+
+            Gated on `loading`, not just `user`: AuthContext starts at
+            user === undefined while GET /auth/me is in flight, which is falsy.
+            Rendering the signed-out branch during that window would show a
+            signed-in user "Ücretsiz üye ol" and, if they clicked it, hand them
+            a registration form that would replace their own session. The nav
+            reserves its height so the swap does not jump the header. */}
+        <nav aria-label="Üst menü" className="flex items-center gap-3 min-h-[40px]">
+          {loading ? null : user ? (
+            <Link to="/feed" className={pillCta} data-testid="cta-feed">Akışa git</Link>
+          ) : (
+            <>
+              <Link to="/login" className="text-sm text-mute hover:text-ink" data-testid="link-login">Giriş</Link>
+              <Link to="/register" className={pillCta} data-testid="cta-register">Ücretsiz üye ol</Link>
+            </>
+          )}
+        </nav>
       </header>
 
+      <main id="main" tabIndex={-1}>
       <section className="max-w-6xl mx-auto px-6 pt-6 md:pt-20 grid md:grid-cols-2 gap-6 md:gap-16 items-center">
         <div>
           <span className="inline-flex items-center gap-2 text-xs font-semibold px-3 py-1 rounded-full bg-violet-soft text-violet">Building Türkiye Challenge</span>
@@ -130,7 +151,70 @@ export default function Landing() {
           dondurulur ve sonrasında pozisyonun gerçekten değişip değişmediği takipçiye gösterilir.
         </p>
       </section>
+      </main>
+
+      {/* Every link below points at a route that actually exists in App.js.
+          The disclosure restates the hero's existing self-reported / not
+          broker-verified / not-advice wording; no new legal, contact or
+          traction claim is introduced here. */}
+      <footer className="border-t border-line bg-surface">
+        <div className="max-w-6xl mx-auto px-6 py-10 md:py-12">
+          <div className="grid gap-8 md:grid-cols-3">
+            <div className="md:col-span-2 max-w-md">
+              <BrandLogo testId="brand-home-footer" />
+              <p className="mt-3 text-sm text-mute">
+                Yatırımcıların söylediklerini değil, yaptıklarını takip edin. Tezinize portföy
+                oranınızı iliştirin; adet ve tutar gizli kalsın.
+              </p>
+            </div>
+
+            <nav aria-labelledby="footer-nav-heading">
+              <h2 id="footer-nav-heading" className="font-heading text-sm font-semibold">
+                Bağlantılar
+              </h2>
+              <ul className="mt-3 space-y-2 text-sm">
+                <li>
+                  <a href="#impact-heading" className="text-mute hover:text-ink underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand rounded">
+                    Neden önemli?
+                  </a>
+                </li>
+                {/* Same `loading` gate as the header — see the note there. */}
+                {loading ? null : user ? (
+                  <>
+                    <li><FooterLink to="/feed" label="Akış" /></li>
+                    <li><FooterLink to="/portfolio" label="Portföy" /></li>
+                  </>
+                ) : (
+                  <>
+                    <li><FooterLink to="/login" label="Giriş" /></li>
+                    <li><FooterLink to="/register" label="Ücretsiz üye ol" /></li>
+                  </>
+                )}
+              </ul>
+            </nav>
+          </div>
+
+          <div className="mt-8 pt-6 border-t border-line flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+            <p className="text-xs text-mute max-w-2xl">
+              Portföyler kullanıcı beyanıdır; aracı kurum doğrulaması yoktur. Fiyatlar Yahoo
+              Finance'ten alınır. Yatırım tavsiyesi değildir.
+            </p>
+            <p className="text-xs text-mute shrink-0">© {new Date().getFullYear()} Divimero</p>
+          </div>
+        </div>
+      </footer>
     </div>
+  );
+}
+
+function FooterLink({ to, label }) {
+  return (
+    <Link
+      to={to}
+      className="text-mute hover:text-ink underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand rounded"
+    >
+      {label}
+    </Link>
   );
 }
 
