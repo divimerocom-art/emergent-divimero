@@ -1,9 +1,19 @@
 """Seed demo data for Divimero — deterministic and safe for judges.
 
-Creates admin + two personas (Deniz creator, Ece follower + 2 extras),
-transactions for Deniz that produce ~5–7% THYAO allocation, several posts
-including a portfolio-linked THYAO thesis, comments, likes, follows, and
-a later partial-sale transaction so the "position reduced" flow is visible.
+Creates admin + four personas: Deniz (creator), Mert (second creator), Ece
+(follower) and Zeynep. Between them the seed demonstrates all four disclosure
+states, because each one is derived from the ledger rather than declared:
+
+  Mert   AKBNK  02.09  -> increased/reduced  ("Azalttı · pozisyonun ~%40'ı")
+  Mert   EREGL  31.08  -> closed             ("Kapattı", full exit)
+  Deniz  THYAO  13.08  -> reduced ~%53       (38 -> 18 shares)
+  Deniz  ASTOR  15.08  -> reduced ~%50       (140 -> 70 shares)
+  Deniz  THYAO  26.08  -> unchanged          (sold BEFORE publishing; no trade since)
+  Deniz  ASTOR  29.08  -> unchanged          (sold BEFORE publishing; price drift only)
+
+Deniz's ledger and his four disclosures are load-bearing: they are the W2
+regression evidence and his portfolio totals are pinned in HANDOFF.md §5.
+Change Mert's data, not his.
 """
 from __future__ import annotations
 import os, uuid
@@ -48,9 +58,11 @@ async def _add_post(db, author_id, text, tickers=None, image_url=None, disclosur
     })
     return pid
 
-async def _snapshot_thyao_disclosure(db, author_id, allocation_pct, when):
+def _disclosure(ticker, allocation_pct, when):
+    """A publication snapshot: the allocation the author consented to publish, frozen at `when`.
+    Quantity is never recorded here — the badge is derived from the ledger at read time."""
     return {
-        "ticker": "THYAO",
+        "ticker": ticker,
         "underlying_allocation_pct": allocation_pct,
         "underlying_quantity": None,
         "disclosed_allocation_pct": round(allocation_pct, 2),
@@ -62,6 +74,10 @@ async def _snapshot_thyao_disclosure(db, author_id, allocation_pct, when):
         "source": "self_reported",
         "snapshot_at": when,
     }
+
+
+async def _snapshot_thyao_disclosure(db, author_id, allocation_pct, when):
+    return _disclosure("THYAO", allocation_pct, when)
 
 async def seed_all(db):
     # 0. admin
@@ -104,11 +120,11 @@ async def seed_all(db):
     await _add_tx(db, deniz, "dividend", "2025-08-20T10:00:00+00:00", ticker="ASTOR", amount=1250, note="ASTOR nakit temettü")
 
     # 2. Deniz posts
-    await _add_post(db, deniz,
+    intro_post = await _add_post(db, deniz,
         "BIST portföyümü Divimero üzerinden şeffaf tutmaya başladım. Her tez ile birlikte pozisyon oranımı da paylaşacağım.",
         tickers=[], created_at="2025-08-10T09:00:00+00:00")
 
-    await _add_post(db, deniz,
+    garan_post = await _add_post(db, deniz,
         "GARAN bilançosu beklentiler doğrultusunda. Net faiz marjı stabil, kredi büyümesi ılımlı. Uzun vadede pozitifim.",
         tickers=["GARAN"], created_at="2025-08-11T10:00:00+00:00")
 
@@ -117,7 +133,7 @@ async def seed_all(db):
     thyao_post = await _add_post(db, deniz,
         "THYAO tezim: yaz sezonu doluluk oranları güçlü, uzun mesafe uçuşlarındaki fiyat gücü marjları destekliyor. "
         "Portföyümde uzun vadeli tuttuğum bir pozisyon. Pozisyon oranımı açıkça paylaşıyorum, adet ve tutarı gizli tutuyorum.",
-        tickers=["THYAO"], image_url=POST_IMG_1, disclosure=disc_1, created_at="2025-08-13T09:30:00+00:00")
+        tickers=["THYAO"], disclosure=disc_1, created_at="2025-08-13T09:30:00+00:00")
 
     # 4. Later, Deniz sells part of THYAO — position reduced
     await _add_tx(db, deniz, "sell", "2025-08-25T10:00:00+00:00", ticker="THYAO", qty=20, price=310.0, fees=25, note="Kısmi kar realizasyonu")
@@ -125,7 +141,7 @@ async def seed_all(db):
     # A follow-up post explaining the trim, with an updated disclosure snapshot
     disc_2_alloc = 2.6  # after the sell, allocation approx drops
     disc_2 = await _snapshot_thyao_disclosure(db, deniz, allocation_pct=disc_2_alloc, when="2025-08-26T09:00:00+00:00")
-    await _add_post(db, deniz,
+    thyao_trim_post = await _add_post(db, deniz,
         "THYAO'da kısmi realizasyon yaptım. Ana tez geçerli, ancak %6+ ağırlık portföyüm için yüksekti. Şeffaflık için pozisyon oranımı güncelliyorum.",
         tickers=["THYAO"], disclosure=disc_2, created_at="2025-08-26T09:00:00+00:00")
 
@@ -159,15 +175,40 @@ async def seed_all(db):
         "source": "self_reported",
         "snapshot_at": "2025-08-29T09:00:00+00:00",
     }
-    await _add_post(db, deniz,
+    astor_trim_post = await _add_post(db, deniz,
         "ASTOR pozisyonumu %8'den %4'lere indirdim. Ana tez değişmedi — portföy ağırlığı için dengeleme yaptım. "
         "Not: sonraki fiyat hareketleri güncel oranı tekrar yukarı çekmiş olabilir; bu sayfa canlı ağırlığı gösteriyor.",
         tickers=["ASTOR"], disclosure=disc_astor_2, created_at="2025-08-29T09:00:00+00:00")
 
     # 5. Another user's normal post + comment on Deniz's post
-    await _add_post(db, mert,
+    mert_note_post = await _add_post(db, mert,
         "Temettü sezonu yaklaşıyor. Bankacılık kağıtlarında beklentim dengeli.",
         tickers=["AKBNK", "GARAN"], created_at="2025-08-14T12:00:00+00:00")
+
+    # 5b. Mert is the second creator, and the one who demonstrates the two badge states
+    # Deniz's ledger cannot reach. Deniz's transactions are deliberately left untouched:
+    # his four disclosures are the W2 regression evidence and his portfolio totals are pinned.
+    await _add_tx(db, mert, "deposit", "2025-07-02T09:00:00+00:00", amount=150000, note="Başlangıç sermayesi")
+    await _add_tx(db, mert, "buy", "2025-07-08T10:00:00+00:00", ticker="AKBNK", qty=900, price=61.50, fees=40, note="AKBNK alım")
+    await _add_tx(db, mert, "buy", "2025-07-09T10:00:00+00:00", ticker="GARAN", qty=300, price=118.00, fees=30, note="GARAN alım")
+    await _add_tx(db, mert, "buy", "2025-07-15T10:00:00+00:00", ticker="EREGL", qty=700, price=48.20, fees=30, note="EREGL alım")
+    await _add_tx(db, mert, "dividend", "2025-08-06T10:00:00+00:00", ticker="AKBNK", amount=1800, note="AKBNK nakit temettü")
+
+    # EREGL thesis, then a full exit -> "Kapattı". The only closed position in the demo.
+    disc_eregl = _disclosure("EREGL", 11.4, "2025-08-31T09:00:00+00:00")
+    eregl_post = await _add_post(db, mert,
+        "EREGL tezim: çelik marjlarında toparlanma bekliyorum, ihracat tarafı destekleyici. "
+        "Portföyümdeki oranı paylaşıyorum, adet ve tutar gizli.",
+        tickers=["EREGL"], disclosure=disc_eregl, created_at="2025-08-31T09:00:00+00:00")
+    await _add_tx(db, mert, "sell", "2025-09-03T10:00:00+00:00", ticker="EREGL", qty=700, price=52.10, fees=35, note="EREGL pozisyon kapatma")
+
+    # AKBNK thesis, then a partial sell -> "Azalttı · pozisyonun ~%40'ı". Newest card in the feed.
+    disc_akbnk = _disclosure("AKBNK", 18.6, "2025-09-02T09:00:00+00:00")
+    akbnk_post = await _add_post(db, mert,
+        "AKBNK tezim: net faiz marjı dipten dönüyor, temettü verimi cazip. Uzun vadeli taşıdığım bir pozisyon. "
+        "Tezimi paylaşıyorsam pozisyonumu da paylaşırım — oran açık, adet ve tutar gizli.",
+        tickers=["AKBNK"], disclosure=disc_akbnk, created_at="2025-09-02T09:00:00+00:00")
+    await _add_tx(db, mert, "sell", "2025-09-05T10:00:00+00:00", ticker="AKBNK", qty=360, price=74.30, fees=35, note="AKBNK kısmi realizasyon")
 
     # Ece follows Deniz + likes & comments the thyao post
     await db.follows.insert_one({"id": _id(), "follower_id": ece, "followee_id": deniz, "created_at": _iso()})
@@ -175,9 +216,52 @@ async def seed_all(db):
     await db.follows.insert_one({"id": _id(), "follower_id": mert, "followee_id": deniz, "created_at": _iso()})
     await db.follows.insert_one({"id": _id(), "follower_id": zeynep, "followee_id": deniz, "created_at": _iso()})
 
-    await db.likes.insert_one({"post_id": thyao_post, "user_id": ece, "created_at": _iso()})
-    await db.likes.insert_one({"post_id": thyao_post, "user_id": mert, "created_at": _iso()})
-    await db.comments.insert_one({"id": _id(), "post_id": thyao_post, "user_id": ece,
-        "text": "Pozisyon oranı paylaşımı için teşekkürler, çok değerli.", "created_at": _iso()})
-    await db.comments.insert_one({"id": _id(), "post_id": thyao_post, "user_id": mert,
-        "text": "Uzun mesafe fiyatlaması konusunda hemfikirim.", "created_at": _iso()})
+    # Engagement, dated between each post and now — seed-time timestamps made a
+    # 2025 post show comments as "az önce".
+    for pid, uid, when in [
+        (thyao_post, ece, "2025-08-13T11:20:00+00:00"),
+        (thyao_post, mert, "2025-08-13T14:05:00+00:00"),
+        (thyao_post, zeynep, "2025-08-14T08:40:00+00:00"),
+        (astor_post, ece, "2025-08-15T12:10:00+00:00"),
+        (astor_post, zeynep, "2025-08-16T09:25:00+00:00"),
+        (astor_trim_post, ece, "2025-08-29T10:15:00+00:00"),
+        (astor_trim_post, mert, "2025-08-29T18:30:00+00:00"),
+        (thyao_trim_post, ece, "2025-08-26T10:05:00+00:00"),
+        (garan_post, mert, "2025-08-11T15:00:00+00:00"),
+        (intro_post, ece, "2025-08-10T10:30:00+00:00"),
+        (mert_note_post, deniz, "2025-08-14T13:10:00+00:00"),
+        (eregl_post, deniz, "2025-08-31T11:45:00+00:00"),
+        (eregl_post, ece, "2025-09-01T08:20:00+00:00"),
+        (akbnk_post, deniz, "2025-09-02T10:40:00+00:00"),
+        (akbnk_post, ece, "2025-09-02T16:05:00+00:00"),
+        (akbnk_post, zeynep, "2025-09-03T09:00:00+00:00"),
+    ]:
+        await db.likes.insert_one({"post_id": pid, "user_id": uid, "created_at": when})
+
+    for pid, uid, text, when in [
+        (thyao_post, ece, "Pozisyon oranı paylaşımı için teşekkürler, çok değerli.", "2025-08-13T11:22:00+00:00"),
+        (thyao_post, mert, "Uzun mesafe fiyatlaması konusunda hemfikirim.", "2025-08-13T14:08:00+00:00"),
+        (astor_trim_post, ece, "Azalttığını rozetten değil, defterden gördüm — bu yüzden buradayım.", "2025-08-29T10:18:00+00:00"),
+        (astor_post, zeynep, "OSB elektrifikasyonu tezine katılıyorum, oranı görmek ayrıca güven veriyor.", "2025-08-16T09:30:00+00:00"),
+        (akbnk_post, deniz, "Temettü verimi tarafında haklısın. Oranı paylaşman tezi daha okunur kılıyor.", "2025-09-02T10:45:00+00:00"),
+        (eregl_post, ece, "Çelik marjları için takipteyim, pozisyonunu izliyorum.", "2025-09-01T08:25:00+00:00"),
+    ]:
+        await db.comments.insert_one({"id": _id(), "post_id": pid, "user_id": uid, "text": text, "created_at": when})
+
+    # 6. The "follow position changes" payoff needs an artifact. Ece watches Deniz's THYAO;
+    # the alert already fired when he trimmed it, so /alerts is a live row and the bell has
+    # an unread badge on the follower demo instead of two empty states.
+    await db.alerts.insert_one({
+        "id": _id(), "user_id": ece, "followee_id": deniz, "ticker": "THYAO",
+        "direction": "decrease", "threshold_pct": 1.0, "created_at": "2025-08-14T09:00:00+00:00",
+    })
+    await db.notifications.insert_one({
+        "id": _id(), "user_id": ece, "kind": "alert", "actor_id": deniz, "post_id": None,
+        "ticker": "THYAO", "before_pct": 6.18, "after_pct": 2.6, "delta_pct": -3.58,
+        "change_kind": "azalttı", "created_at": "2025-08-26T09:05:00+00:00", "read": False,
+    })
+    await db.notifications.insert_one({
+        "id": _id(), "user_id": ece, "kind": "new_post", "actor_id": deniz,
+        "post_id": astor_trim_post, "has_disclosure": True,
+        "created_at": "2025-08-29T09:01:00+00:00", "read": False,
+    })

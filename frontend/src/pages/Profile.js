@@ -125,7 +125,7 @@ export default function Profile() {
               const cur = d.current?.allocation_pct ?? 0;
               const last = d.last_disclosed;
               const status = d.change_status;
-              const trend = status === "increased" ? "Artırdı" : status === "reduced" ? "Azalttı" : status === "closed" ? "Kapatıldı" : status === "unchanged" ? "Değişmedi" : "—";
+              const trend = status === "increased" ? "Artırdı" : status === "reduced" ? "Azalttı" : status === "closed" ? "Kapattı" : status === "unchanged" ? "Değişmedi" : "—";
               const c = status === "increased" ? "text-pos" : status === "reduced" ? "text-neg" : "text-mute";
               return (
                 <li key={d.ticker} className="px-4 md:px-5 py-3 flex items-center gap-4 flex-wrap" data-testid={`disc-${d.ticker}`}>

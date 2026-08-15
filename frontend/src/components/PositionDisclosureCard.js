@@ -19,13 +19,13 @@ export default function PositionDisclosureCard({ disclosure, current }) {
       case "increased": return { label: "Artırdı", icon: ArrowUp, color: "text-pos", bg: "bg-brand-soft" };
       case "reduced":   return { label: "Azalttı", icon: ArrowDown, color: "text-neg", bg: "bg-orangeSoft" };
       case "unchanged": return { label: "Değişmedi", icon: Minus, color: "text-mute", bg: "bg-surface" };
-      case "closed":    return { label: "Kapatıldı", icon: Circle, color: "text-mute", bg: "bg-surface" };
+      case "closed":    return { label: "Kapattı", icon: Circle, color: "text-mute", bg: "bg-surface" };
       default:          return null;
     }
   })();
 
   // Relative size of the move, e.g. "pozisyonun ~%50'si". Only present for
-  // increased/reduced — "Kapatıldı" and "Değişmedi" are already unambiguous.
+  // increased/reduced — "Kapattı" and "Değişmedi" are already unambiguous.
   const magnitude = disclosure.change_magnitude_pct ?? null;
 
   return (
