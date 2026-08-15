@@ -139,12 +139,16 @@ export default function Profile() {
                   {d.change_magnitude_pct != null && (
                     <span className="text-[11px] text-mute">· {positionShare(d.change_magnitude_pct)}</span>
                   )}
-                  {/* Same reference-frame note the disclosure card carries. Without it these rows
-                      read as broken arithmetic: the two percentages differ while the label says
-                      "Değişmedi". This list is on the PUBLIC profile route. */}
+                  {/* Without this, the row reads as broken arithmetic: the two percentages differ
+                      while the label says "Değişmedi". Deliberately a statement about what the
+                      badge measures rather than the card's causal "fark fiyat hareketinden":
+                      here `last_disclosed` and the snapshot behind `change_status` can come from
+                      different posts (server.py:763 writes last_snapshot_at for every disclosure
+                      post, but last_disclosed only for exact-value ones), so attributing the whole
+                      gap to price would be a claim we cannot support on a public route. */}
                   {status === "unchanged" && last != null && Math.abs(cur - last) >= 0.01 && (
                     <span className="basis-full text-[11px] text-mute" data-testid={`disc-drift-${d.ticker}`}>
-                      Adet değişmedi — orandaki fark fiyat hareketinden.
+                      Rozet oran farkına değil, adet değişimine bakar.
                     </span>
                   )}
                 </li>

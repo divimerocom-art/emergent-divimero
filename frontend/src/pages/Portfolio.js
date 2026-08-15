@@ -74,8 +74,9 @@ export default function Portfolio() {
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={series} margin={{ top: 8, right: 12, bottom: 4, left: 0 }}>
                 <CartesianGrid stroke="#E3E3E3" strokeDasharray="3 3" vertical={false} />
-                <XAxis dataKey="date" stroke="#72777F" fontSize={11}/>
-                <YAxis stroke="#72777F" fontSize={11} tickFormatter={(v)=> new Intl.NumberFormat('tr-TR',{notation:'compact'}).format(v)} width={55}/>
+                {/* Same value as the `mute` token; these 11px tick labels sat at 4.51:1 on white. */}
+                <XAxis dataKey="date" stroke="#5F656D" fontSize={11}/>
+                <YAxis stroke="#5F656D" fontSize={11} tickFormatter={(v)=> new Intl.NumberFormat('tr-TR',{notation:'compact'}).format(v)} width={55}/>
                 <Tooltip formatter={(v)=>money(v)} contentStyle={{ borderRadius: 12, border: '1px solid #E3E3E3' }}/>
                 <Line type="monotone" dataKey="value" stroke="#35C7B2" strokeWidth={2.5} dot={false} />
               </LineChart>

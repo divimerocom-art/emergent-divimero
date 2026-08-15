@@ -45,7 +45,7 @@ export default function Landing() {
             Bir yatırımcı bir hisseyi övdüğünde gerçekten tutuyor mu, portföyünün ne kadarı, sonra sessizce azalttı mı?
             Divimero her tezi yayınlandığı andaki portföy oranına bağlar ve pozisyon değiştiğinde takipçiye gösterir.
           </p>
-          <p className="mt-2 text-sm text-mute max-w-xl block" data-testid="hero-en-summary">
+          <p lang="en" className="mt-2 text-sm text-mute max-w-xl block" data-testid="hero-en-summary">
             Divimero lets Turkish investors track their BIST portfolio and — when they choose — share their position size transparently alongside their content.
           </p>
           <div className="mt-7 flex flex-wrap items-center gap-3">
