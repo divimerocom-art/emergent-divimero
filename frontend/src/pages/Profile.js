@@ -139,6 +139,14 @@ export default function Profile() {
                   {d.change_magnitude_pct != null && (
                     <span className="text-[11px] text-mute">· {positionShare(d.change_magnitude_pct)}</span>
                   )}
+                  {/* Same reference-frame note the disclosure card carries. Without it these rows
+                      read as broken arithmetic: the two percentages differ while the label says
+                      "Değişmedi". This list is on the PUBLIC profile route. */}
+                  {status === "unchanged" && last != null && Math.abs(cur - last) >= 0.01 && (
+                    <span className="basis-full text-[11px] text-mute" data-testid={`disc-drift-${d.ticker}`}>
+                      Adet değişmedi — orandaki fark fiyat hareketinden.
+                    </span>
+                  )}
                 </li>
               );
             })}
