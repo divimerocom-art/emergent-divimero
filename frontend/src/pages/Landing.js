@@ -1,5 +1,5 @@
 import { Link, useNavigate } from "react-router-dom";
-import { TrendingUp, ShieldCheck, Eye, ArrowRight } from "lucide-react";
+import { TrendingUp, ShieldCheck, Eye, ArrowRight, ArrowDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/context/AuthContext";
 import { useState } from "react";
@@ -33,7 +33,7 @@ export default function Landing() {
         </div>
       </header>
 
-      <section className="max-w-6xl mx-auto px-6 pt-10 md:pt-20 grid md:grid-cols-2 gap-10 md:gap-16 items-center">
+      <section className="max-w-6xl mx-auto px-6 pt-6 md:pt-20 grid md:grid-cols-2 gap-6 md:gap-16 items-center">
         <div>
           <span className="inline-flex items-center gap-2 text-xs font-semibold px-3 py-1 rounded-full bg-violet-soft text-violet">Building Türkiye Challenge</span>
           <h1 className="mt-4 font-heading text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight leading-[1.05]">
@@ -42,53 +42,59 @@ export default function Landing() {
             yaptıklarını takip edin.
           </h1>
           <p className="mt-5 text-lg text-mute max-w-xl">
-            Divimero, BIST portföyünüzü takip etmenizi ve — istediğinizde — pozisyon oranınızı içeriklerinizle şeffaf biçimde paylaşmanızı sağlar.
+            Bir yatırımcı bir hisseyi övdüğünde gerçekten tutuyor mu, portföyünün ne kadarı, sonra sessizce azalttı mı?
+            Divimero her tezi yayınlandığı andaki portföy oranına bağlar ve pozisyon değiştiğinde takipçiye gösterir.
           </p>
-          <p className="mt-2 text-sm text-mute/80 max-w-xl" data-testid="hero-en-summary">
+          <p className="mt-2 text-sm text-mute/80 max-w-xl hidden md:block" data-testid="hero-en-summary">
             Divimero lets Turkish investors track their BIST portfolio and — when they choose — share their position size transparently alongside their content.
           </p>
-          <div className="mt-7 flex flex-wrap gap-3">
+          <div className="mt-7 flex flex-wrap items-center gap-3">
             <Button onClick={()=>demo("deniz@divimero.com")} disabled={busy} size="lg" className="rounded-full bg-brand hover:bg-brand/90 text-white h-12 px-6" data-testid="hero-demo-deniz">
               Demoyu incele — kayıt gerekmez <ArrowRight size={18} className="ml-1"/>
             </Button>
-            <Button onClick={()=>demo("ece@divimero.com")} disabled={busy} size="lg" variant="outline" className="rounded-full h-12 px-6 border-line" data-testid="hero-demo-ece">
-              Takipçi demosu — kayıt gerekmez
-            </Button>
-            <Button onClick={()=>nav("/register")} size="lg" variant="outline" className="rounded-full h-12 px-6 border-line" data-testid="hero-register">
-              Hemen başla
-            </Button>
+            <button onClick={()=>demo("ece@divimero.com")} disabled={busy} className="text-sm text-mute underline underline-offset-4 hover:text-ink disabled:opacity-50" data-testid="hero-demo-ece">
+              Takipçi olarak gir
+            </button>
           </div>
-          <p className="mt-4 text-xs text-mute">Piyasa fiyatları demo amaçlı, açıkça etiketlenmiştir. Yatırım tavsiyesi değildir.</p>
+          <p className="mt-4 text-xs text-mute">Fiyatlar Yahoo Finance'ten canlı alınır. Portföyler kullanıcı beyanıdır, aracı kurum doğrulaması yoktur. Yatırım tavsiyesi değildir.</p>
         </div>
 
         <div className="relative">
-          <div className="rounded-2xl border border-line bg-white p-5 shadow-sm">
-            <div className="text-xs uppercase tracking-wider text-mute font-heading font-semibold">Portföye Bağlı Pozisyon</div>
-            <div className="mt-2 flex items-center justify-between">
-              <div>
-                <div className="text-xs text-mute">THYAO</div>
-                <div className="font-heading text-xl font-bold">Türk Hava Yolları</div>
+          {/* The card the judge meets one click later. Keep these figures identical to the
+              seeded THYAO thesis — a promo that disagrees with the demo costs more trust
+              than it buys. */}
+          <div className="rounded-2xl border border-line border-l-4 border-l-brand bg-surface p-5 shadow-sm">
+            <div className="flex items-start justify-between gap-2">
+              <div className="flex items-center gap-2 flex-wrap min-w-0">
+                <span className="text-xs uppercase tracking-wider text-mute font-heading font-semibold">Portföye Bağlı Pozisyon</span>
+                <span className="text-[10px] px-2 py-0.5 rounded-full bg-white border border-line text-mute whitespace-nowrap shrink-0">Kişisel beyan</span>
               </div>
-              <span className="text-[10px] px-2 py-0.5 rounded-full bg-white border border-line text-mute">Kişisel beyan</span>
+              <span className="font-heading font-bold text-ink shrink-0">THYAO</span>
             </div>
-            <div className="mt-4 grid grid-cols-2 gap-3">
-              <div className="rounded-xl bg-surface p-3">
+            <div className="mt-4 grid grid-cols-[1fr_auto_1fr] items-center gap-2 md:gap-3">
+              <div className="rounded-xl bg-white border border-line p-3">
                 <div className="text-[11px] uppercase tracking-wider text-mute font-medium">Yayınlandığında</div>
-                <div className="mt-1 font-heading text-2xl font-bold tabular">%5.20</div>
+                <div className="mt-1 font-heading text-2xl md:text-3xl font-bold tabular">%6,18</div>
               </div>
-              <div className="rounded-xl bg-surface p-3">
+              <ArrowRight size={16} className="text-mute shrink-0" aria-hidden="true"/>
+              <div className="rounded-xl bg-white border border-line p-3">
                 <div className="text-[11px] uppercase tracking-wider text-mute font-medium">Güncel</div>
-                <div className="mt-1 font-heading text-2xl font-bold tabular">%2.60</div>
+                <div className="mt-1 font-heading text-2xl md:text-3xl font-bold tabular">%1,83</div>
               </div>
             </div>
-            <div className="mt-3">
-              <span className="inline-flex items-center gap-1 text-xs font-semibold px-2.5 py-1 rounded-full bg-orangeSoft text-neg">↓ Azalttı</span>
-              <span className="ml-2 text-[11px] text-mute">Adet gizli · Tutar gizli</span>
+            <div className="mt-3 flex items-center gap-2 flex-wrap">
+              <span className="text-[11px] uppercase tracking-wider text-mute font-medium">Yayından bu yana</span>
+              <span className="inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-full bg-orangeSoft text-neg">
+                <ArrowDown size={14}/> Azalttı <span className="font-medium">· pozisyonun ~%53'ü</span>
+              </span>
+            </div>
+            <div className="mt-2 flex items-center gap-2 flex-wrap text-[11px] text-mute">
+              <span>Adet gizli</span><span>Tutar gizli</span>
             </div>
           </div>
 
-          <div className="mt-4 grid grid-cols-3 gap-3">
-            <Feature icon={<TrendingUp className="text-brand" size={18}/>} bg="bg-brand-soft" title="Portföy" text="Manuel işlem, FIFO maliyet, gerçek/gerçekleşmemiş K/Z."/>
+          <div className="mt-4 grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <Feature icon={<TrendingUp className="text-brand" size={18}/>} bg="bg-brand-soft" title="Portföy" text="FIFO maliyet, gerçekleşen K/Z, temettü, XIRR."/>
             <Feature icon={<ShieldCheck className="text-violet" size={18}/>} bg="bg-violet-soft" title="Gizlilik" text="Oranı paylaş, adet ve tutarı gizle."/>
             <Feature icon={<Eye className="text-orange" size={18}/>} bg="bg-orangeSoft" title="Şeffaflık" text="Pozisyon değişimini takipçilerin görsün."/>
           </div>
