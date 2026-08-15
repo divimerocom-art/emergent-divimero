@@ -488,6 +488,9 @@ def _sanitize_disclosure(d: Optional[dict]) -> Optional[dict]:
 
 
 def _change_status(underlying_pub: Optional[float], current_pct: Optional[float]) -> Optional[str]:
+    """DEPRECATED — allocation-pct based classifier. Kept only for the seed's
+    snapshot back-fill so nothing else breaks. Actual feed/post change_status
+    now comes from _qty_change (share-count based)."""
     if underlying_pub is None or current_pct is None:
         return None
     if current_pct <= 0.05:
@@ -496,6 +499,42 @@ def _change_status(underlying_pub: Optional[float], current_pct: Optional[float]
     if abs(diff) < 0.1:
         return "unchanged"
     return "increased" if diff > 0 else "reduced"
+
+
+def _qty_at(sorted_txs: List[dict], ticker: str, cutoff_iso: Optional[str]) -> float:
+    """Walk the ticker's ledger up to `cutoff_iso` inclusive and return net qty.
+    Dividends don't affect qty. Deposits/withdraws are cash-only."""
+    q = 0.0
+    sym = (ticker or "").upper()
+    for t in sorted_txs:
+        if cutoff_iso and (t.get("date") or "") > cutoff_iso:
+            break
+        if (t.get("ticker") or "").upper() != sym:
+            continue
+        ttype = (t.get("type") or "").lower()
+        n = float(t.get("quantity") or 0)
+        if ttype == "buy":
+            q += n
+        elif ttype == "sell":
+            q -= n
+    return max(0.0, q)
+
+
+def _qty_change(sorted_txs: List[dict], ticker: str, snapshot_at: Optional[str]) -> tuple[Optional[str], Optional[float]]:
+    """Return (change_status, change_ratio) based purely on share count.
+    change_ratio = (qty_now - qty_at_pub) / qty_at_pub  (None when qty_at_pub == 0).
+    change_status ∈ {increased, reduced, unchanged, closed}."""
+    qty_now = _qty_at(sorted_txs, ticker, None)
+    qty_pub = _qty_at(sorted_txs, ticker, snapshot_at)
+    if qty_pub <= 1e-9:
+        return (None, None)
+    if qty_now <= 1e-9:
+        return ("closed", -1.0)
+    diff = qty_now - qty_pub
+    if abs(diff) < 1e-9:
+        return ("unchanged", 0.0)
+    ratio = diff / qty_pub
+    return (("increased" if diff > 0 else "reduced"), ratio)
 
 
 async def _hydrate_post(post: dict, viewer_id: Optional[str]) -> dict:
