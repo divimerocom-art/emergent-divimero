@@ -25,10 +25,14 @@ function Private({ children }) {
 }
 
 function AppRoutes() {
-  const { user, loading } = useAuth();
   return (
     <Routes>
-      <Route path="/" element={loading ? <div className="p-10 text-mute">Yükleniyor…</div> : (user ? <Navigate to="/feed" replace /> : <Landing />)} />
+      {/* "/" is the landing page for everyone. Authenticated users are no longer
+          bounced to /feed — they reach it through the explicit Akış navigation.
+          Landing now paints immediately instead of waiting on GET /auth/me, so
+          anything it renders from `user` must also gate on `loading` — see the
+          note on the header nav in Landing.js. */}
+      <Route path="/" element={<Landing />} />
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
 
