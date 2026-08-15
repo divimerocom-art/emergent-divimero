@@ -74,8 +74,9 @@ export default function Portfolio() {
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={series} margin={{ top: 8, right: 12, bottom: 4, left: 0 }}>
                 <CartesianGrid stroke="#E3E3E3" strokeDasharray="3 3" vertical={false} />
-                <XAxis dataKey="date" stroke="#72777F" fontSize={11}/>
-                <YAxis stroke="#72777F" fontSize={11} tickFormatter={(v)=> new Intl.NumberFormat('tr-TR',{notation:'compact'}).format(v)} width={55}/>
+                {/* Same value as the `mute` token; these 11px tick labels sat at 4.51:1 on white. */}
+                <XAxis dataKey="date" stroke="#5F656D" fontSize={11}/>
+                <YAxis stroke="#5F656D" fontSize={11} tickFormatter={(v)=> new Intl.NumberFormat('tr-TR',{notation:'compact'}).format(v)} width={55}/>
                 <Tooltip formatter={(v)=>money(v)} contentStyle={{ borderRadius: 12, border: '1px solid #E3E3E3' }}/>
                 <Line type="monotone" dataKey="value" stroke="#35C7B2" strokeWidth={2.5} dot={false} />
               </LineChart>
@@ -97,13 +98,16 @@ export default function Portfolio() {
             <table className="w-full text-sm">
               <thead className="text-xs uppercase tracking-wider text-mute">
                 <tr className="text-left">
-                  <th className="px-4 py-3">Hisse</th>
-                  <th className="px-4 py-3 text-right">Adet</th>
-                  <th className="px-4 py-3 text-right">Ort. Maliyet</th>
-                  <th className="px-4 py-3 text-right">Fiyat</th>
-                  <th className="px-4 py-3 text-right">Değer</th>
-                  <th className="px-4 py-3 text-right">Ağırlık</th>
-                  <th className="px-4 py-3 text-right">K/Z</th>
+                  {/* Ort. Maliyet / Fiyat / Değer are hidden below sm so that Ağırlık and K/Z —
+                      the two columns the product is about — stay on screen at 375px instead of
+                      sitting behind an undiscoverable horizontal scroll. Desktop is unchanged. */}
+                  <th className="px-2 sm:px-4 py-3">Hisse</th>
+                  <th className="px-2 sm:px-4 py-3 text-right">Adet</th>
+                  <th className="hidden sm:table-cell px-2 sm:px-4 py-3 text-right">Ort. Maliyet</th>
+                  <th className="hidden sm:table-cell px-2 sm:px-4 py-3 text-right">Fiyat</th>
+                  <th className="hidden sm:table-cell px-2 sm:px-4 py-3 text-right">Değer</th>
+                  <th className="px-2 sm:px-4 py-3 text-right">Ağırlık</th>
+                  <th className="px-2 sm:px-4 py-3 text-right">K/Z</th>
                 </tr>
               </thead>
               <tbody>
@@ -111,14 +115,14 @@ export default function Portfolio() {
                   const up = h.unrealized_pl >= 0;
                   return (
                     <tr key={h.ticker} className="border-t border-line" data-testid={`hold-${h.ticker}`}>
-                      <td className="px-4 py-3 font-heading font-semibold">{h.ticker}</td>
-                      <td className="px-4 py-3 text-right tabular">{h.quantity.toLocaleString('tr-TR')}</td>
-                      <td className="px-4 py-3 text-right tabular text-mute">{money(h.avg_cost)}</td>
-                      <td className="px-4 py-3 text-right tabular">{money(h.market_price)}</td>
-                      <td className="px-4 py-3 text-right tabular font-medium">{money(h.market_value)}</td>
-                      <td className="px-4 py-3 text-right tabular">{pct(h.allocation_pct)}</td>
-                      <td className={`px-4 py-3 text-right tabular font-semibold ${up ? "text-pos" : "text-neg"}`}>
-                        {up ? "+" : ""}{money(h.unrealized_pl)} <span className="text-xs opacity-80">({pct(h.unrealized_pl_pct)})</span>
+                      <td className="px-2 sm:px-4 py-3 font-heading font-semibold">{h.ticker}</td>
+                      <td className="px-2 sm:px-4 py-3 text-right tabular">{h.quantity.toLocaleString('tr-TR')}</td>
+                      <td className="hidden sm:table-cell px-2 sm:px-4 py-3 text-right tabular text-mute">{money(h.avg_cost)}</td>
+                      <td className="hidden sm:table-cell px-2 sm:px-4 py-3 text-right tabular">{money(h.market_price)}</td>
+                      <td className="hidden sm:table-cell px-2 sm:px-4 py-3 text-right tabular font-medium">{money(h.market_value)}</td>
+                      <td className="px-2 sm:px-4 py-3 text-right tabular">{pct(h.allocation_pct)}</td>
+                      <td className={`px-2 sm:px-4 py-3 text-right tabular font-semibold ${up ? "text-pos" : "text-neg"}`}>
+                        {up ? "+" : ""}{money(h.unrealized_pl)} <span className="block sm:inline text-xs opacity-80">({pct(h.unrealized_pl_pct)})</span>
                       </td>
                     </tr>
                   );
@@ -151,12 +155,12 @@ export default function Portfolio() {
               </div>
               <ul className="divide-y divide-line">
                 {[...divs].reverse().map(d => (
-                  <li key={d.id} className="px-4 py-3 flex items-center gap-3 text-sm" data-testid={`div-${d.id}`}>
-                    <span className="text-xs font-semibold uppercase tracking-wider text-violet min-w-[70px]">Temettü</span>
-                    <span className="font-heading font-semibold w-16">{d.ticker || "—"}</span>
-                    <span className="flex-1 text-mute truncate">{d.note || <span className="italic">not yok</span>}</span>
-                    <span className="tabular text-mute">{new Date(d.date).toLocaleDateString('tr-TR')}</span>
-                    <span className="tabular font-medium text-violet">{money(d.amount)}</span>
+                  <li key={d.id} className="px-4 py-3 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm" data-testid={`div-${d.id}`}>
+                    <span className="order-1 text-xs font-semibold uppercase tracking-wider text-violet min-w-[70px]">Temettü</span>
+                    <span className="order-2 font-heading font-semibold w-16">{d.ticker || "—"}</span>
+                    <span className="order-4 sm:order-3 basis-full sm:basis-auto sm:flex-1 min-w-0 text-mute truncate">{d.note || <span className="italic">not yok</span>}</span>
+                    <span className="order-5 sm:order-4 tabular text-mute">{new Date(d.date).toLocaleDateString('tr-TR')}</span>
+                    <span className="order-3 sm:order-5 ml-auto sm:ml-0 tabular font-medium text-violet">{money(d.amount)}</span>
                   </li>
                 ))}
               </ul>
@@ -176,12 +180,15 @@ export default function Portfolio() {
               const label = { buy:"Alım", sell:"Satım", deposit:"Nakit Yatırma", withdraw:"Nakit Çekme", dividend:"Temettü" }[t.type] || t.type;
               const color = { buy:"text-brand", sell:"text-orange", deposit:"text-mute", withdraw:"text-mute", dividend:"text-violet" }[t.type];
               return (
-                <li key={t.id} className="px-4 py-3 flex items-center gap-3 text-sm">
-                  <span className={`text-xs font-semibold uppercase tracking-wider ${color} min-w-[80px]`}>{label}</span>
-                  <span className="font-heading font-semibold w-16">{t.ticker || "—"}</span>
-                  <span className="tabular text-mute flex-1">{t.quantity ? `${t.quantity} adet` : ""} {t.price ? `× ${money(t.price)}` : ""}</span>
-                  <span className="tabular text-mute">{new Date(t.date).toLocaleDateString('tr-TR')}</span>
-                  <span className="tabular font-medium">{t.amount ? money(t.amount) : (t.quantity && t.price ? money(t.quantity * t.price) : "")}</span>
+                // Five items cannot share one 375px line. Below sm the row wraps to two lines —
+                // tür/hisse/tutar first, adet × fiyat and the date second — via order-* overrides
+                // that all reset at sm, so the desktop row is unchanged.
+                <li key={t.id} className="px-4 py-3 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm">
+                  <span className={`order-1 text-xs font-semibold uppercase tracking-wider ${color} min-w-[80px]`}>{label}</span>
+                  <span className="order-2 font-heading font-semibold w-16">{t.ticker || "—"}</span>
+                  <span className="order-4 sm:order-3 basis-full sm:basis-auto sm:flex-1 tabular text-mute">{t.quantity ? `${t.quantity} adet` : ""} {t.price ? `× ${money(t.price)}` : ""}</span>
+                  <span className="order-5 sm:order-4 tabular text-mute">{new Date(t.date).toLocaleDateString('tr-TR')}</span>
+                  <span className="order-3 sm:order-5 ml-auto sm:ml-0 tabular font-medium">{t.amount ? money(t.amount) : (t.quantity && t.price ? money(t.quantity * t.price) : "")}</span>
                 </li>
               );
             })}
